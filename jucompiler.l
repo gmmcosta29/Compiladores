@@ -6,7 +6,7 @@
             RESERVED
             SEQUENCIAS DE ESCAPE
             ULTIMA PARTE DE REALLIT E INTLIT "_"
-            
+
     */
 %}
 aspas "
@@ -14,6 +14,7 @@ numero				[0-9]+
 expoente            [eE][+-]
 numero0             [1-9]
 numero1             [0-9]*
+
 %%
 {numero}"."{numero}{expoente}{numero}   return REALLIT
 "."{numero}{expoente}{numero}   return REALLIT
@@ -71,3 +72,10 @@ numero1             [0-9]*
 
 
 %%
+int main(){
+    yylex();return 0;
+}
+
+int yywrap(){
+    return 1;
+}
