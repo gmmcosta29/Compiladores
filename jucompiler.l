@@ -9,21 +9,37 @@
 
     */
 %}
+
 aspas "
 numero				[0-9]+
 expoente            [eE][+-]
 numero0             [1-9]
 numero1             [0-9]*
+underscore          "-"*
+f                   "\f"
+n                   "\n"
+r                   "\r"
+t                   "t"
+doubles             "\\"
+singles             "\"
+escape              [A-z][^n][^r][^f][^t]
 
+%X STRING
 %%
-{numero}"."{numero}{expoente}{numero}   return REALLIT
-"."{numero}{expoente}{numero}   return REALLIT
-{numero}"."{expoente}{numero}   return REALLIT
-{numero0}{numero}{expoente}{numero}   return REALLIT
-{numero}"."{numero}     return REALLINT
+{numero0}{numero1}"."{numero}{expoente}{numero0}{numero}   return REALLIT
+"."{numero}{expoente}{numero0}{numero}   return REALLIT
+{numero0}{numero1}"."{expoente}{numero0}{numero}   return REALLIT
+{numero0}{numero}{expoente}{numero0}{numero}   return REALLIT
+{numero0}{numero1}"."{numero1}     return REALLINT
 "."{numero}         return REALLIT
+{numero0}{numero1}{underscore}{numero}     return INTLIT
 {numero0}{numero1}   return INTLIT
 "0"                 return INTLIT
+{aspas}             {BEGIN STRING;}
+<STRING> {singles}{escape}      return Erro
+<STRING> {aspas}            {BEGIN 0;}
+{aspas}.{escape}.{aspas}
+
 {aspas}.{aspas}     return STRLIT
 "while"             return WHILE
 "void"              return VOID
