@@ -1,0 +1,17 @@
+{numero0}{numero1}"."{numero}{expoente}{numero0}{numero}   {printf("REALLIT1(%s)\n",yytext);}
+"."{numero}{expoente}{numero0}{numero}   {printf("REALLIT2(%s)\n",yytext);}
+{numero0}{numero1}"."{expoente}{numero0}{numero}   {printf("REALLIT3(%s)\n",yytext);}
+{numero0}{numero}{expoente}{numero0}{numero}   {printf("REALLIT4(%s)\n",yytext);}
+{numero0}{numero1}"."{numero1}     {printf("REALLINT5(%s)\n",yytext);}
+"0."{numero1}     {printf("REALLINT5(%s)\n",yytext);}
+"."{numero}         {printf("REALLIT(%s)\n",yytext);}
+{expoente}         {printf("MERDA");}
+
+
+
+
+{numero0}{numero1}{underscore}{numero}     {printf("INTLIT(%s)\n",yytext);}
+{numero0}{numero1}   {printf("INTLIT(%s)\n",yytext);}
+"0"                 {printf("INTLIT(%s)\n",yytext);}
+{numero0}{numero1}{underscore}{numero}     {printf("INTLIT(%s)\n",yytext);}
+{numero0}{numero1}   {printf("INTLIT(%s)\n",yytext);}

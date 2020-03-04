@@ -46,3 +46,4 @@
 #define VOID "VOID"
 #define WHILE "WHILE"
 #define RESERVED "RESERVED"
+#define Erro "Dope"
