@@ -3,8 +3,9 @@
 #include <stdlib.h>
     int nline = 1;
     int column = 1;
+    int errors = 0;
 
-    char buffer[128];
+    char buffer[128] = "";
     char *s;
 
 
@@ -18,41 +19,43 @@ void updatecol(int n){
     
 %}
 
-SEQESCAPE	(\\n|\\\\|\\t|\\f|\\r)
-INVALIDESCAPE	\\[^ntfr\"]
+SEQESCAPE	\\n|\\\\|\\t|\\f|\\r|\\\"
+INVALIDESCAPE	(\\[^n|t|f|r|\\|"""])
 STARTCOMMENT_1	(\/)(\/)
 INITSTRING            \"
-numero				([0-9 | _]+)
-numeroall           [0-9 |_]*
+numero				([0-9|_]+)
+numeroall           [0-9|_]*
 semzero             [1-9]+
 expoente           ([Ee]?[+-]?)
 escape              [A-z][^n][^r][^f][^t]
 id                  [A-Za-z_$][A-Za-z_$0-9]*
 reserved            "++"|"--"|"null"|"System"|"Integer"|"abstract"|"continue"|"for"|"new"|"default"|"package"|"synchronized"|"do"|"goto"|"private"|"implements"|"protected"|"import"|"enum"|"instanceof"|"extends"|"short"|"final"|"interface"|"finally"|"long"|"strictfp"|"float"|"native"|"super"|"switch"|"throw"|"throws"|"assert"|"this"|"break"|"byte"|"case"|"transient"|"catch"|"try"|"char"|"volatile"|"const"|"_"
-IGNORE		\ |\t
+IGNORE		\ |\\t
 
 
 %X STRING COMMENT COMMENT_1
 %%
-{numero}"."                                                                 {printf("REALLIT(%s)\n",yytext);}
 
-{semzero}{numeroall}{expoente}{semzero}{numeroall}                          {printf("REALLIT(%s)\n",yytext);}
-{semzero}{numeroall}"."{numeroall}{expoente}{numeroall}            {printf("REALLIT(%s)\n",yytext);}
-"0"?"."{numero}{expoente}{semzero}{numeroall}                               {printf("REALLIT(%s)\n",yytext);}
-{semzero}{numeroall}{expoente}{semzero}{numeroall}"."{numero}               {printf("REALLIT(%s)\n",yytext);}
-{semzero}{numeroall}{expoente}"0"?"."{numero}                               {printf("REALLIT(%s)\n",yytext);}
-"0"?"."{numero}                                                             {printf("REALLIT(%s)\n",yytext);}
-{semzero}{numeroall}"."{numeroall}{expoente}{semzero}{numeroall}"."{numero} {printf("REALLIT(%s)\n",yytext);}
-"0"?"."{numero}{expoente}{semzero}{numeroall}"."{numero}                    {printf("REALLIT(%s)\n",yytext);}
-{semzero}{numeroall}"."{numeroall}{expoente}"0"?"."{numero}                 {printf("REALLIT(%s)\n",yytext);}
-"0"?"."{numero}{expoente}"0"?"."{numero}                                    {printf("REALLIT(%s)\n",yytext);}
+"0"                                                                         {printf("INTLIT(0)\n");column+=yyleng;}
+{semzero}{numeroall}                                                        {printf("INTLIT(%s)\n",yytext);column+=yyleng;}
 
-"0"                                                                         {printf("INTLIT(0)\n");}
-{semzero}{numeroall}                                                        {printf("INTLIT(%s)\n",yytext);}
+{numero}"."                                                                 {printf("REALLIT(%s)\n",yytext);column+=yyleng;}
+{semzero}{numeroall}{expoente}{semzero}{numeroall}                          {printf("REALLIT(%s)\n",yytext);column+=yyleng;}
+{semzero}{numeroall}"."{numeroall}{expoente}{numeroall}            {printf("REALLIT(%s)\n",yytext);column+=yyleng;}
+"0"?"."{numero}{expoente}{semzero}{numeroall}                               {printf("REALLIT(%s)\n",yytext);column+=yyleng;}
+{semzero}{numeroall}{expoente}{semzero}{numeroall}"."{numero}               {printf("REALLIT(%s)\n",yytext);column+=yyleng;}
+{semzero}{numeroall}{expoente}"0"?"."{numero}                               {printf("REALLIT(%s)\n",yytext);column+=yyleng;}
+"0"?"."{numero}                                                             {printf("REALLIT(%s)\n",yytext);column+=yyleng;}
+{semzero}{numeroall}"."{numeroall}{expoente}{semzero}{numeroall}"."{numero} {printf("REALLIT(%s)\n",yytext);column+=yyleng;}
+"0"?"."{numero}{expoente}{semzero}{numeroall}"."{numero}                    {printf("REALLIT(%s)\n",yytext);column+=yyleng;}
+{semzero}{numeroall}"."{numeroall}{expoente}"0"?"."{numero}                 {printf("REALLIT(%s)\n",yytext);column+=yyleng;}
+"0"?"."{numero}{expoente}"0"?"."{numero}                                    {printf("REALLIT(%s)\n",yytext);column+=yyleng;}
+
+
 
 
 "/*"                BEGIN COMMENT;
-<COMMENT>[^*\n]*        nline++;
+<COMMENT>[^*\n]*        resetline();
 <COMMENT>"*/"           BEGIN INITIAL;          //Finaliza o comentario
 <COMMENT>"*"            //ignora
 <COMMENT><<EOF>>				        {printf("Line %d, column %d: unterminated comment\n",nline, column);BEGIN 0;}
@@ -61,11 +64,11 @@ IGNORE		\ |\t
 <COMMENT_1>.					
 <COMMENT_1>(\n)					{BEGIN 0; resetline();}
 
-{INITSTRING}                    {BEGIN STRING;s = buffer;}
-<STRING>[^\n\"]			    {*s ++ = *yytext; column+=yyleng;}
-<STRING>{INITSTRING}            {BEGIN 0;*s = 0;printf("STRLIT(\"%s\")\n",buffer);}
-<STRING>\n                    {BEGIN 0;printf("Line %d,col %d:unterminated string literal\n",nline,column);}
-<STRING>{INVALIDESCAPE}         {*s = 0;printf("Line %d, col %d: invalid escape sequence (%s)\n",nline,column,yytext);}
+{INITSTRING}                    {BEGIN STRING;s = buffer;errors = 0;}
+<STRING>([^\n\"])			        {*s ++= *yytext; column+=yyleng;}
+<STRING>{INVALIDESCAPE}         {errors = 1;printf("Line %d, col %d: invalid escape sequence (%s)\n",nline,column,yytext);column+=yyleng;}
+<STRING>{INITSTRING}            {BEGIN 0;*s = 0;if(errors == 0)printf("STRLIT(\"%s\")\n",buffer);}
+<STRING>\n                    {BEGIN 0;printf("Line %d,col %d:unterminated string literal\n",nline,column);resetline();}
 
 
 "while"             {printf("WHILE\n");}
