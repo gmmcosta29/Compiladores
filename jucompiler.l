@@ -54,11 +54,11 @@ IGNORE		\ |\\t
 
 
 
-"/*"                BEGIN COMMENT;
-<COMMENT>[^*\n]*        resetline();
-<COMMENT>"*/"           BEGIN INITIAL;          //Finaliza o comentario
-<COMMENT>"*"            //ignora
-<COMMENT><<EOF>>				        {printf("Line %d, column %d: unterminated comment\n",nline, column);BEGIN 0;}
+"/*"                BEGIN COMMENT;column+=yyleng;
+<COMMENT>(\n)        resetline();
+<COMMENT>"*/"           BEGIN 0;column+=yyleng;          //Finaliza o comentario
+<COMMENT>.            column+=yyleng;
+<COMMENT><<EOF>>	    {BEGIN 0;printf("Line %d, column %d: unterminated comment\n",nline, column);BEGIN 0;}
 
 {STARTCOMMENT_1}				{BEGIN COMMENT_1;}
 <COMMENT_1>.					
@@ -71,11 +71,11 @@ IGNORE		\ |\\t
 <STRING>\n                    {BEGIN 0;printf("Line %d,col %d:unterminated string literal\n",nline,column);resetline();}
 
 
-"while"             {printf("WHILE\n");}
-"void"              {printf("VOID\n");}
-"String"            {printf("STRING\n");}
-"static"            {printf("STATIC\n");}
-"return"            {printf("RETURN\n");}
+"while"             {printf("WHILE\n");column+=yyleng;}
+"void"              {printf("VOID\n");column+=yyleng;}
+"String"            {printf("STRING\n");column+=yyleng;}
+"static"            {printf("STATIC\n");column+=yyleng;}
+"return"            {printf("RETURN\n");column+=yyleng;}
 "public"            {printf("PUBLIC\n");}
 "Integer.parseInt"  {printf("PARSEINT\n");}
 "System.out.print"  {printf("PRINT\n");}
