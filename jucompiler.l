@@ -1,58 +1,72 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
-char* remove_(char* s){
-    for(int i = 0;i<strlen(s);i++){
-        if(s[i] == '_'){
-            s[i] = "";
-        }
-    }
-    return s;
-}    
-    
+    int nline = 1;
+    int column = 1;
+
+    char buffer[128];
+    char *s;
+
+
+  void resetline(){
+  	nline++;
+	column=1;
+}
+void updatecol(int n){
+    column +=n;
+}  
     
 %}
 
-
-aspas                \"
-numero				([0-9 | "_"]+)
-numeroall           [0-9 | "_"]*
+SEQESCAPE	(\\n|\\\\|\\t|\\f|\\r)
+INVALIDESCAPE	\\[^ntfr\"]
+STARTCOMMENT_1	(\/)(\/)
+INITSTRING            \"
+numero				([0-9 | _]+)
+numeroall           [0-9 |_]*
 semzero             [1-9]+
-aab                 "aab"
-expoente           ([Ee][+-])
-underscore          "_"*
-f                   "\f"[A-Za-z]
-n                   "\n"
-r                   "\r"
-t                   "t"
-doubles             "\\"
-singles             "\"
+expoente           ([Ee]?[+-]?)
 escape              [A-z][^n][^r][^f][^t]
-id                  [A-Za-z][A-Za-z_$0-9]*
+id                  [A-Za-z_$][A-Za-z_$0-9]*
 reserved            "++"|"--"|"null"|"System"|"Integer"|"abstract"|"continue"|"for"|"new"|"default"|"package"|"synchronized"|"do"|"goto"|"private"|"implements"|"protected"|"import"|"enum"|"instanceof"|"extends"|"short"|"final"|"interface"|"finally"|"long"|"strictfp"|"float"|"native"|"super"|"switch"|"throw"|"throws"|"assert"|"this"|"break"|"byte"|"case"|"transient"|"catch"|"try"|"char"|"volatile"|"const"|"_"
+IGNORE		\ |\t
 
 
-%X STRING
+%X STRING COMMENT COMMENT_1
 %%
-[ \t\n]+          /* eat up whitespace */
-{semzero}{numeroall}{expoente}{semzero}{numeroall}                          {printf("REALLIT(%s\n)",remove_(yytext));}
-{semzero}{numeroall}"."{numeroall}{expoente}{semzero}{numeroall}            {printf("REALLIT(%s\n)",remove_(yytext));}
-"0"?"."{numero}{expoente}{semzero}{numeroall}                               {printf("REALLIT(%s\n)",remove_(yytext));}
-{semzero}{numeroall}{expoente}{semzero}{numeroall}"."{numero}               {printf("REALLIT(%s\n)",remove_(yytext));}
-{semzero}{numeroall}{expoente}"0"?"."{numero}                               {printf("REALLIT(%s\n)",remove_(yytext));}
-{semzero}{numeroall}"."{numero}                                             {printf("REALLIT(%s\n)",remove_(yytext));}
-"0"?"."{numero}                                                             {printf("REALLIT(%s\n)",remove_(yytext));}
-{semzero}{numeroall}"."{numeroall}{expoente}{semzero}{numeroall}"."{numero} {printf("REALLIT(%s\n)",remove_(yytext));}
-"0"?"."{numero}{expoente}{semzero}{numeroall}"."{numero}                    {printf("REALLIT(%s\n)",remove_(yytext));}
-{semzero}{numeroall}"."{numeroall}{expoente}"0"?"."{numero}                 {printf("REALLIT(%s\n)",remove_(yytext));}
-"0"?"."{numero}{expoente}"0"?"."{numero}                                    {printf("REALLIT(%s\n)",remove_(yytext));}
+{numero}"."                                                                 {printf("REALLIT(%s)\n",yytext);}
+
+{semzero}{numeroall}{expoente}{semzero}{numeroall}                          {printf("REALLIT(%s)\n",yytext);}
+{semzero}{numeroall}"."{numeroall}{expoente}{numeroall}            {printf("REALLIT(%s)\n",yytext);}
+"0"?"."{numero}{expoente}{semzero}{numeroall}                               {printf("REALLIT(%s)\n",yytext);}
+{semzero}{numeroall}{expoente}{semzero}{numeroall}"."{numero}               {printf("REALLIT(%s)\n",yytext);}
+{semzero}{numeroall}{expoente}"0"?"."{numero}                               {printf("REALLIT(%s)\n",yytext);}
+"0"?"."{numero}                                                             {printf("REALLIT(%s)\n",yytext);}
+{semzero}{numeroall}"."{numeroall}{expoente}{semzero}{numeroall}"."{numero} {printf("REALLIT(%s)\n",yytext);}
+"0"?"."{numero}{expoente}{semzero}{numeroall}"."{numero}                    {printf("REALLIT(%s)\n",yytext);}
+{semzero}{numeroall}"."{numeroall}{expoente}"0"?"."{numero}                 {printf("REALLIT(%s)\n",yytext);}
+"0"?"."{numero}{expoente}"0"?"."{numero}                                    {printf("REALLIT(%s)\n",yytext);}
 
 "0"                                                                         {printf("INTLIT(0)\n");}
-{semzero}{numeroall}                                                        {printf("INTLIT(%s)\n",remove_(yytext));}
+{semzero}{numeroall}                                                        {printf("INTLIT(%s)\n",yytext);}
 
 
-{aspas}.{escape}.{aspas}      {printf("STR\n");}
-{aspas}.{aspas}     {printf("STRLIT\n");}
+"/*"                BEGIN COMMENT;
+<COMMENT>[^*\n]*        nline++;
+<COMMENT>"*/"           BEGIN INITIAL;          //Finaliza o comentario
+<COMMENT>"*"            //ignora
+<COMMENT><<EOF>>				        {printf("Line %d, column %d: unterminated comment\n",nline, column);BEGIN 0;}
+
+{STARTCOMMENT_1}				{BEGIN COMMENT_1;}
+<COMMENT_1>.					
+<COMMENT_1>(\n)					{BEGIN 0; resetline();}
+
+{INITSTRING}                    {BEGIN STRING;s = buffer;}
+<STRING>[^\n\"]			    {*s ++ = *yytext; column+=yyleng;}
+<STRING>{INITSTRING}            {BEGIN 0;*s = 0;printf("STRLIT(\"%s\")\n",buffer);}
+<STRING>\n                    {BEGIN 0;printf("Line %d,col %d:unterminated string literal\n",nline,column);}
+<STRING>{INVALIDESCAPE}         {*s = 0;printf("Line %d, col %d: invalid escape sequence (%s)\n",nline,column,yytext);}
+
 
 "while"             {printf("WHILE\n");}
 "void"              {printf("VOID\n");}
@@ -101,14 +115,22 @@ reserved            "++"|"--"|"null"|"System"|"Integer"|"abstract"|"continue"|"f
 {reserved}          {printf("RESERVED\n");}
 {id}                {printf("ID(%s)\n",yytext);}
 
+{IGNORE}            {updatecol(yyleng);}
+\n						{resetline();}
+.					{printf("Line %d, column %d: illegal character (%s)\n",nline,column,yytext);updatecol(yyleng);}
+
 %%
-int main()
-{
+int main(int argc, char *argv[ ]){
+    if(argc==2){
+        char * str = "-l";
+        if(strcmp(argv[1],str)==0){
+            //state=1;
+        }
+    }
     yylex();
     return 0;
 }
 
-int yywrap()
-{
-return 1;
+int yywrap(){
+    return 1;
 }

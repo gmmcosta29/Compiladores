@@ -15,3 +15,38 @@
 "0"                 {printf("INTLIT(%s)\n",yytext);}
 {numero0}{numero1}{underscore}{numero}     {printf("INTLIT(%s)\n",yytext);}
 {numero0}{numero1}   {printf("INTLIT(%s)\n",yytext);}
+
+
+
+
+
+
+
+{CENA}               {BEGIN STRING;}
+<STRING>"8"       {printf("eroo\n");}
+<STRING>([^\n|\"])*       {printf("STRLIT(%s)\n",yytext);}
+<STRING>{CENA}       {BEGIN 0;}
+
+
+
+
+SEQESCAPE	(\\n)|(\\\\)|(\\t)|(\\f)|(\\r)|(\\\")
+INVALIDESCAPE	(\\[^ntfr\"])
+
+ACCEPTED            \"
+STR                 .*^\"
+
+TESTER              (\\[^ntfr\"])
+
+
+{ACCEPTED}               {BEGIN STRING;}
+<STRING>(\\[^n|t])*				{printf("ERROR");}
+<STRING>([^\\n|\"])*       {printf("STRLIT(%s)\n",yytext);}
+<STRING>{ACCEPTED}       {BEGIN 0;}
+
+
+<STRING>({SEQESCAPE})*  yymore();
+<STRING>\n         printf("Line %d,col %d:unterminated string literal\n",nline,column);
+<STRING>\\\n       yymore();
+<STRING>\"         yytext[yyleng-1] = '\0';printf("STRLIT(\"%s)\n",yyval);
+<STRING>{INVALIDESCAPE}\"				{BEGIN 0;printf("Line %d, column %d: invalid escape seuence (\%c)\n",nline,column,yytext[yyleng-1]);}
