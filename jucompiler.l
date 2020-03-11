@@ -4,6 +4,7 @@
     int nline = 1;
     int column = 1;
     int errors = 0;
+    int state = 0;
 
     char buffer[128] = "";
     char *s;
@@ -36,20 +37,20 @@ IGNORE		\ |\\t
 %X STRING COMMENT COMMENT_1
 %%
 
-"0"                                                                         {printf("INTLIT(0)\n");column+=yyleng;}
-{semzero}{numeroall}                                                        {printf("INTLIT(%s)\n",yytext);column+=yyleng;}
+"0"                                                                         {if (state==1)printf("INTLIT(0)\n");column+=yyleng;}
+{semzero}{numeroall}                                                        {if (state==1)printf("INTLIT(%s)\n",yytext);column+=yyleng;}
 
-{numero}"."                                                                 {printf("REALLIT(%s)\n",yytext);column+=yyleng;}
-{semzero}{numeroall}{expoente}{semzero}{numeroall}                          {printf("REALLIT(%s)\n",yytext);column+=yyleng;}
-{semzero}{numeroall}"."{numeroall}{expoente}{numeroall}            {printf("REALLIT(%s)\n",yytext);column+=yyleng;}
-"0"?"."{numero}{expoente}{semzero}{numeroall}                               {printf("REALLIT(%s)\n",yytext);column+=yyleng;}
-{semzero}{numeroall}{expoente}{semzero}{numeroall}"."{numero}               {printf("REALLIT(%s)\n",yytext);column+=yyleng;}
-{semzero}{numeroall}{expoente}"0"?"."{numero}                               {printf("REALLIT(%s)\n",yytext);column+=yyleng;}
-"0"?"."{numero}                                                             {printf("REALLIT(%s)\n",yytext);column+=yyleng;}
-{semzero}{numeroall}"."{numeroall}{expoente}{semzero}{numeroall}"."{numero} {printf("REALLIT(%s)\n",yytext);column+=yyleng;}
-"0"?"."{numero}{expoente}{semzero}{numeroall}"."{numero}                    {printf("REALLIT(%s)\n",yytext);column+=yyleng;}
-{semzero}{numeroall}"."{numeroall}{expoente}"0"?"."{numero}                 {printf("REALLIT(%s)\n",yytext);column+=yyleng;}
-"0"?"."{numero}{expoente}"0"?"."{numero}                                    {printf("REALLIT(%s)\n",yytext);column+=yyleng;}
+{numero}"."                                                                 {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;}
+{semzero}{numeroall}{expoente}{semzero}{numeroall}                          {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;}
+{semzero}{numeroall}"."{numeroall}{expoente}{numeroall}            {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;}
+"0"?"."{numero}{expoente}{semzero}{numeroall}                               {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;}
+{semzero}{numeroall}{expoente}{semzero}{numeroall}"."{numero}               {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;}
+{semzero}{numeroall}{expoente}"0"?"."{numero}                               {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;}
+"0"?"."{numero}                                                             {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;}
+{semzero}{numeroall}"."{numeroall}{expoente}{semzero}{numeroall}"."{numero} {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;}
+"0"?"."{numero}{expoente}{semzero}{numeroall}"."{numero}                    {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;}
+{semzero}{numeroall}"."{numeroall}{expoente}"0"?"."{numero}                 {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;}
+"0"?"."{numero}{expoente}"0"?"."{numero}                                    {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;}
 
 
 
@@ -71,52 +72,52 @@ IGNORE		\ |\\t
 <STRING>\n                    {BEGIN 0;printf("Line %d,col %d:unterminated string literal\n",nline,column);resetline();}
 
 
-"while"             {printf("WHILE\n");}
-"void"              {printf("VOID\n");}
-"String"            {printf("STRING\n");}
-"static"            {printf("STATIC\n");}
-"return"            {printf("RETURN\n");}
-"public"            {printf("PUBLIC\n");}
-"Integer.parseInt"  {printf("PARSEINT\n");}
-"System.out.print"  {printf("PRINT\n");}
-"int"               {printf("INT\n");}
-"if"                {printf("IF\n");}
-"else"              {printf("ELSE\n");}
-"double"            {printf("DOUBLE\n");}
-".length"           {printf("DOTLENGTH\n");}
-"class"             {printf("CLASS\n");}
-"boolean"           {printf("BOOL\n");}
-"^"                 {printf("XOR\n");}
-">>"                {printf("RSHIFT\n");}
-"<<"                {printf("LSHIFT\n");}
-"->"                {printf("ARROW\n");}
-";"                 {printf("SEMICOLON\n");}
-"]"                 {printf("RSQ\n");}
-")"                 {printf("RPAR\n");}
-"}"                 {printf("RBRACE\n");}
-"+"                 {printf("PLUS\n");}
-"||"                {printf("OR\n");}
-"!"                 {printf("NOT\n");}
-"!="                {printf("NE\n");}
-"%"                 {printf("MOD\n");}
-"-"                 {printf("MINUS\n");}
-"<"                 {printf("LT\n");}
-"["                 {printf("LSQ\n");}
-"("                 {printf("LPAR\n");}
-"<="                {printf("LE\n");}
-"{"                 {printf("LBRACE\n");}
-">"                 {printf("GT\n");}
-">="                {printf("GE\n");}
-"=="                {printf("EQ\n");}
-"/"                 {printf("DIV\n");}
-","                 {printf("COMMA\n");}
-"*"                 {printf("STAR\n");}
-"="                 {printf("ASSIGN\n");}
-"&&"                {printf("AND\n");}
-"true"              {printf("BOOLLIT\n");}
-"false"             {printf("BOOLLIT\n");}
-{reserved}          {printf("RESERVED\n");}
-{id}                {printf("ID(%s)\n",yytext);}
+"while"             {if (state==1)printf("WHILE\n");}
+"void"              {if (state==1)printf("VOID\n");}
+"String"            {if (state==1)printf("STRING\n");}
+"static"            {if (state==1)printf("STATIC\n");}
+"return"            {if (state==1)printf("RETURN\n");}
+"public"            {if (state==1)printf("PUBLIC\n");}
+"Integer.parseInt"  {if (state==1)printf("PARSEINT\n");}
+"System.out.print"  {if (state==1)printf("PRINT\n");}
+"int"               {if (state==1)printf("INT\n");}
+"if"                {if (state==1)printf("IF\n");}
+"else"              {if (state==1)printf("ELSE\n");}
+"double"            {if (state==1)printf("DOUBLE\n");}
+".length"           {if (state==1)printf("DOTLENGTH\n");}
+"class"             {if (state==1)printf("CLASS\n");}
+"boolean"           {if (state==1)printf("BOOL\n");}
+"^"                 {if (state==1)printf("XOR\n");}
+">>"                {if (state==1)printf("RSHIFT\n");}
+"<<"                {if (state==1)printf("LSHIFT\n");}
+"->"                {if (state==1)printf("ARROW\n");}
+";"                 {if (state==1)printf("SEMICOLON\n");}
+"]"                 {if (state==1)printf("RSQ\n");}
+")"                 {if (state==1)printf("RPAR\n");}
+"}"                 {if (state==1)printf("RBRACE\n");}
+"+"                 {if (state==1)printf("PLUS\n");}
+"||"                {if (state==1)printf("OR\n");}
+"!"                 {if (state==1)printf("NOT\n");}
+"!="                {if (state==1)printf("NE\n");}
+"%"                 {if (state==1)printf("MOD\n");}
+"-"                 {if (state==1)printf("MINUS\n");}
+"<"                 {if (state==1)printf("LT\n");}
+"["                 {if (state==1)printf("LSQ\n");}
+"("                 {if (state==1)printf("LPAR\n");}
+"<="                {if (state==1)printf("LE\n");}
+"{"                 {if (state==1)printf("LBRACE\n");}
+">"                 {if (state==1)printf("GT\n");}
+">="                {if (state==1)printf("GE\n");}
+"=="                {if (state==1)printf("EQ\n");}
+"/"                 {if (state==1)printf("DIV\n");}
+","                 {if (state==1)printf("COMMA\n");}
+"*"                 {if (state==1)printf("STAR\n");}
+"="                 {if (state==1)printf("ASSIGN\n");}
+"&&"                {if (state==1)printf("AND\n");}
+"true"              {if (state==1)printf("BOOLLIT\n");}
+"false"             {if (state==1)printf("BOOLLIT\n");}
+{reserved}          {if (state==1)printf("RESERVED\n");}
+{id}                {if (state==1)printf("ID(%s)\n",yytext);}
 
 {IGNORE}            {updatecol(yyleng);}
 \n						{resetline();}
@@ -127,7 +128,7 @@ int main(int argc, char *argv[ ]){
     if(argc==2){
         char * str = "-l";
         if(strcmp(argv[1],str)==0){
-            //state=1;
+            state=1;
         }
     }
     yylex();
