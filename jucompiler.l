@@ -15,9 +15,9 @@
 
     
 %}
-NEWLINE             "\n"|"\r\n"|"\r"
+NEWLINE             \n|\r\n|\r
 SEQESCAPE		(\\n)|(\\\\)|(\\t)|(\\f)|(\\r)|(\\\")
-INVALIDESCAPE	    \\[^rntf]
+INVALIDESCAPE	    (\r\n)|(\\[^rntf])
 STARTCOMMENT_1	    (\/)(\/)
 INITSTRING            \"
 UNDERSCORE          "_"
@@ -29,7 +29,7 @@ expoente           ([Ee]?[+-]?)
 escape              [A-z][^n][^r][^f][^t]
 id                  [A-Za-z_$][A-Za-z_$0-9]*
 reserved            "++"|"--"|"null"|"System"|"Integer"|"abstract"|"continue"|"for"|"new"|"default"|"package"|"synchronized"|"do"|"goto"|"private"|"implements"|"protected"|"import"|"enum"|"instanceof"|"extends"|"short"|"final"|"interface"|"finally"|"long"|"strictfp"|"float"|"native"|"super"|"switch"|"throw"|"throws"|"assert"|"this"|"break"|"byte"|"case"|"transient"|"catch"|"try"|"char"|"volatile"|"const"
-IGNORE		        [ \t]*
+IGNORE		        [" "\t]*
 
 
 %X STRING COMMENT COMMENT_1 
@@ -75,7 +75,7 @@ IGNORE		        [ \t]*
 <STRING>{SEQESCAPE}             yymore();column+=2;
 <STRING>\"                      {yytext[yyleng-1] = '\0'; if(errors == 0 && state == 1){printf("STRLIT(\"%s\")\n",yytext);} BEGIN(0);column+=1;}
 <STRING>\n               printf("Line %d,col %d: unterminated string literal\n",errol,erroc);BEGIN(0);resetline();
-<STRING>{INVALIDESCAPE}|[\r\n]		    {printf("Line %d, column %d: invalid escape sequence (\\%c)\n",nline,column,yytext[yyleng-1]);errors = 1;}
+<STRING>{INVALIDESCAPE}		    {printf("Line %d, col %d: invalid escape sequence (\\%c)\n",nline,column,yytext[yyleng-1]);errors = 1;}
 
 
 
@@ -127,7 +127,7 @@ IGNORE		        [ \t]*
 
 {IGNORE}            column+=yyleng;
 {NEWLINE}		    {resetline();}
-.					{printf("Line %d, column %d: illegal character (%s)\n",nline,column,yytext);column+=yyleng;}
+.					{printf("Line %d, col %d: illegal character (%s)\n",nline,column,yytext);column+=yyleng;}
 
 %%
 int main(int argc, char *argv[ ]){
