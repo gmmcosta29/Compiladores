@@ -15,10 +15,10 @@
 
     
 %}
-
-SEQESCAPE	\\n|\\\\|\\t|\\f|\\r|\\\"
-INVALIDESCAPE	\\[^ntfr\"]
-STARTCOMMENT_1	(\/)(\/)
+NEWLINE             "\n"|"\r\n"|"\r"
+SEQESCAPE		(\\n)|(\\\\)|(\\t)|(\\f)|(\\r)|(\\\")
+INVALIDESCAPE	    \\[^rntf]
+STARTCOMMENT_1	    (\/)(\/)
 INITSTRING            \"
 UNDERSCORE          "_"
 numero				([0-9|_]+)
@@ -29,10 +29,10 @@ expoente           ([Ee]?[+-]?)
 escape              [A-z][^n][^r][^f][^t]
 id                  [A-Za-z_$][A-Za-z_$0-9]*
 reserved            "++"|"--"|"null"|"System"|"Integer"|"abstract"|"continue"|"for"|"new"|"default"|"package"|"synchronized"|"do"|"goto"|"private"|"implements"|"protected"|"import"|"enum"|"instanceof"|"extends"|"short"|"final"|"interface"|"finally"|"long"|"strictfp"|"float"|"native"|"super"|"switch"|"throw"|"throws"|"assert"|"this"|"break"|"byte"|"case"|"transient"|"catch"|"try"|"char"|"volatile"|"const"
-IGNORE		[" "|"\t"|"\v"|"\f"|"\r"]
+IGNORE		        [ \t]*
 
 
-%X STRING COMMENT COMMENT_1
+%X STRING COMMENT COMMENT_1 
 %%
 {reserved}          {if (state==1)printf("RESERVED(%s)\n",yytext);column+=yyleng;}
 
@@ -57,24 +57,26 @@ IGNORE		[" "|"\t"|"\v"|"\f"|"\r"]
 
 
 
+
 {STARTCOMMENT_1}				{BEGIN COMMENT_1;}
 <COMMENT_1>.					
-<COMMENT_1>\n?				{BEGIN 0; resetline();}
+<COMMENT_1>\n				{BEGIN 0; resetline();}
 
 
-"/*"                 BEGIN COMMENT;errol = nline;erroc = column;column+=yyleng;
+"/*"                    BEGIN COMMENT;errol = nline;erroc = column;column+=yyleng;
 <COMMENT>"*/"           BEGIN INITIAL;column+=yyleng;          //Finaliza o comentario
 <COMMENT><<EOF>>	    {BEGIN 0;printf("Line %d, col %d: unterminated comment\n",errol, erroc);}
 <COMMENT>.              column+=yyleng;
-<COMMENT>\n           resetline();
+<COMMENT>\n             {resetline();}
 
 
 \"                              BEGIN(STRING);errors = 0;errol = nline;erroc = column;column+=yyleng;
-<STRING>[^\\\n"]*               yymore();
-<STRING>{INVALIDESCAPE}			{yymore();printf("Line %d, column %d: invalid escape sequence (\\%c)\n",nline,column,yytext[yyleng-1]);}
-<STRING>\n                      printf("Unterminated string."); BEGIN(INITIAL);
-<STRING>{SEQESCAPE}             yymore();column+=yyleng;
-<STRING>\"                      {yytext[yyleng-1] = '\0'; printf("STRLIT(\"%s\")\n",yytext); BEGIN(INITIAL);column+=yyleng;}
+<STRING>([^\n\"])               yymore();column+=1;
+<STRING>{SEQESCAPE}             yymore();column+=2;
+<STRING>\"                      {yytext[yyleng-1] = '\0'; if(errors == 0 && state == 1){printf("STRLIT(\"%s\")\n",yytext);} BEGIN(0);column+=1;}
+<STRING>\n               printf("Line %d,col %d: unterminated string literal\n",errol,erroc);BEGIN(0);resetline();
+<STRING>{INVALIDESCAPE}|[\r\n]		    {printf("Line %d, column %d: invalid escape sequence (\\%c)\n",nline,column,yytext[yyleng-1]);errors = 1;}
+
 
 
 "while"             {if (state==1)printf("WHILE\n");column+=yyleng;}
@@ -123,8 +125,8 @@ IGNORE		[" "|"\t"|"\v"|"\f"|"\r"]
 "false"             {if (state==1)printf("BOOLLIT(false)\n");column+=yyleng;}
 {id}                {if (state==1)printf("ID(%s)\n",yytext);column+=yyleng;}
 
-{IGNORE}            {column+=yyleng;}
-\n				    {resetline();}
+{IGNORE}            column+=yyleng;
+{NEWLINE}		    {resetline();}
 .					{printf("Line %d, column %d: illegal character (%s)\n",nline,column,yytext);column+=yyleng;}
 
 %%
