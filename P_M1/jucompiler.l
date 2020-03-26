@@ -15,21 +15,19 @@
 
     
 %}
-NEWLINE             \n|\r\n|\r
-SEQESCAPE		(\\n)|(\\\\)|(\\t)|(\\f)|(\\r)|(\\\")
-INVALIDESCAPE	    (\r\n)|(\\[^rntf])
-STARTCOMMENT_1	    (\/)(\/)
-INITSTRING            \"
+NEWLINE             \r|\n|\r\n
+STARTCOMMENT_1	    "//"
+NUMEROZERO          ([1-9]([0-9|_]*[0-9])?)|0   
+NUMERO                 [0-9]([0-9|_]*[0-9])?              
+INITSTRING           \"
 UNDERSCORE          "_"
-numero				([0-9|_]+)
 numeroall           [0-9|_]*
 numerof             [0-9]+
 semzero             [1-9]+
-expoente           ([Ee]?[+-]?)
-escape              [A-z][^n][^r][^f][^t]
+expoente           ([Ee][+-]?)
 id                  [A-Za-z_$][A-Za-z_$0-9]*
 reserved            "++"|"--"|"null"|"System"|"Integer"|"abstract"|"continue"|"for"|"new"|"default"|"package"|"synchronized"|"do"|"goto"|"private"|"implements"|"protected"|"import"|"enum"|"instanceof"|"extends"|"short"|"final"|"interface"|"finally"|"long"|"strictfp"|"float"|"native"|"super"|"switch"|"throw"|"throws"|"assert"|"this"|"break"|"byte"|"case"|"transient"|"catch"|"try"|"char"|"volatile"|"const"
-IGNORE		        [" "\t]*
+IGNORE		        " "|\t|\f
 
 
 %X STRING COMMENT COMMENT_1 
@@ -41,42 +39,10 @@ IGNORE		        [" "\t]*
 {semzero}                                                        {if (state==1)printf("INTLIT(%s)\n",yytext);column+=yyleng;}
 
 
-{numero}"."                                                                 {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;}
-{semzero}{numeroall}{expoente}{semzero}{numeroall}{numerof}                          {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;}
-{semzero}{numeroall}{expoente}{semzero}                          {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;}
-{semzero}{numeroall}"."{numeroall}{expoente}{numeroall}{numerof}            {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;}
-"0"?"."{numero}{expoente}{semzero}{numeroall}{numerof}                               {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;}
-{semzero}{numeroall}{expoente}{semzero}{numeroall}"."{numero}{numerof}               {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;}
-{semzero}{numeroall}{expoente}"0"?"."{numero}{numerof}                               {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;}
-"0"?"."{numero}{numerof}                                                             {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;}
-"0"?"."{numerof}                                                             {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;}
-{semzero}{numeroall}"."{numeroall}{expoente}{semzero}{numeroall}"."{numero}{numerof} {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;}
-"0"?"."{numero}{expoente}{semzero}{numeroall}"."{numero}{numerof}                    {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;}
-{semzero}{numeroall}"."{numeroall}{expoente}"0"?"."{numero}{numerof}                 {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;}
-"0"?"."{numero}{expoente}"0"?"."{numero}{numerof}                                    {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;}
-
-
-
-
-{STARTCOMMENT_1}				{BEGIN COMMENT_1;}
-<COMMENT_1>.					
-<COMMENT_1>\n				{BEGIN 0; resetline();}
-
-
-"/*"                    BEGIN COMMENT;errol = nline;erroc = column;column+=yyleng;
-<COMMENT>"*/"           BEGIN INITIAL;column+=yyleng;          //Finaliza o comentario
-<COMMENT><<EOF>>	    {BEGIN 0;printf("Line %d, col %d: unterminated comment\n",errol, erroc);}
-<COMMENT>.              column+=yyleng;
-<COMMENT>\n             {resetline();}
-
-
-\"                              BEGIN(STRING);errors = 0;errol = nline;erroc = column;column+=yyleng;
-<STRING>([^\n\"])               yymore();column+=1;
-<STRING>{SEQESCAPE}             yymore();column+=2;
-<STRING>\"                      {yytext[yyleng-1] = '\0'; if(errors == 0 && state == 1){printf("STRLIT(\"%s\")\n",yytext);} BEGIN(0);column+=1;}
-<STRING>\n               printf("Line %d,col %d: unterminated string literal\n",errol,erroc);BEGIN(0);resetline();
-<STRING>{INVALIDESCAPE}		    {printf("Line %d, col %d: invalid escape sequence (\\%c)\n",nline,column,yytext[yyleng-1]);errors = 1;}
-
+{NUMERO}"."{NUMERO}?                      {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;}
+{NUMERO}?"."{NUMERO}                      {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;}
+{NUMERO}?"."{NUMERO}?{expoente}{NUMERO}                       {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;}
+{NUMERO}{expoente}{NUMERO}                       {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;}
 
 
 "while"             {if (state==1)printf("WHILE\n");column+=yyleng;}
@@ -125,8 +91,30 @@ IGNORE		        [" "\t]*
 "false"             {if (state==1)printf("BOOLLIT(false)\n");column+=yyleng;}
 {id}                {if (state==1)printf("ID(%s)\n",yytext);column+=yyleng;}
 
-{IGNORE}            column+=yyleng;
+<STRING><<EOF>>	                {printf("Line %d, col %d: unterminated string literal\n",errol,erroc);yyterminate();}
+\"                              {BEGIN(STRING);errors = 0;errol = nline;erroc = column;column+=yyleng;}
+<STRING>\"                      {yytext[yyleng-1] = '\0'; if(errors == 0 && state == 1){printf("STRLIT(\"%s\")\n",yytext);} BEGIN INITIAL;column+=1;}
+<STRING>\n|\r\n|\r              {printf("Line %d, col %d: unterminated string literal\n",errol,erroc);BEGIN 0;resetline();}
+<STRING>\\[\\fnrt"]             {yymore();column+=2;}
+<STRING>\\		                {printf("Line %d, col %d: invalid escape sequence (\\)\n",nline,column);errors = 1;column+=1;}
+<STRING>\\[^\n\r]?		        {printf("Line %d, col %d: invalid escape sequence (\\%c)\n",nline,column,yytext[yyleng - 1]);errors = 1;column+=2;}
+<STRING>.                       {yymore();column+=1;}
+
+{STARTCOMMENT_1}				{BEGIN COMMENT_1;}
+<COMMENT_1>{NEWLINE}				{BEGIN 0; resetline();}
+<COMMENT_1>.					
+
+<COMMENT><<EOF>>	    {printf("Line %d, col %d: unterminated comment\n",errol, erroc);yyterminate();} 
+"/*"                   {BEGIN COMMENT;errol = nline;erroc = column;column+=yyleng;}
+<COMMENT>"*/"           {BEGIN INITIAL;column+=yyleng;}
+<COMMENT>{NEWLINE}             {resetline();}
+<COMMENT>.                      {column+=yyleng;}
+
+{IGNORE}            {column+=yyleng;}
 {NEWLINE}		    {resetline();}
+
+
+
 .					{printf("Line %d, col %d: illegal character (%s)\n",nline,column,yytext);column+=yyleng;}
 
 %%
