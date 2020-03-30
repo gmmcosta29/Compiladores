@@ -1,11 +1,13 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include "y.tab.h"
+#include <ctype.h>
     /*      Francisco Forte Nº2016225674
             Guilherme Costa Nº2017249276
     */
 
-
+    int yaccError = 0;
     int nline = 1;
     int column = 1;
     int errors = 0;
@@ -38,7 +40,7 @@ IGNORE		        " "|\t|\f
 
 %X STRING COMMENT COMMENT_1 
 %%
-{reserved}          {if (state==1)printf("RESERVED(%s)\n",yytext);column+=yyleng;if(parseState==1) return RESERVED;)}
+{reserved}          {if (state==1)printf("RESERVED(%s)\n",yytext);column+=yyleng;if(parseState==1) return RESERVED;}
 
 "0"                                                                         {if (state==1)printf("INTLIT(0)\n");column+=yyleng;if(parseState==1) return INTLIT;}
 {semzero}{numeroall}{numerof}                                                        {if (state==1)printf("INTLIT(%s)\n",yytext);column+=yyleng;if(parseState==1) return INTLIT;}
@@ -53,7 +55,7 @@ IGNORE		        " "|\t|\f
 
 "while"             {if (state==1)printf("WHILE\n");column+=yyleng;if(parseState==1) return WHILE;}
 "void"              {if (state==1)printf("VOID\n");column+=yyleng;if(parseState==1) return VOID;}
-"String"            {if (state==1)printf("STRING\n");column+=yyleng;if(parseState==1) return STRING;}
+"String"            {if (state==1)printf("STRING\n");column+=yyleng;if(parseState==1) return STRING1;}
 "static"            {if (state==1)printf("STATIC\n");column+=yyleng;if(parseState==1) return STATIC;}
 "return"            {if (state==1)printf("RETURN\n");column+=yyleng;if(parseState==1) return RETURN;}
 "public"            {if (state==1)printf("PUBLIC\n");column+=yyleng;if(parseState==1) return PUBLIC;}
@@ -99,11 +101,11 @@ IGNORE		        " "|\t|\f
 
 <STRING><<EOF>>	                {printf("Line %d, col %d: unterminated string literal\n",errol,erroc);yyterminate();}
 \"                              {BEGIN(STRING);errors = 0;errol = nline;erroc = column;column+=yyleng;}
-<STRING>\"                      {yytext[yyleng-1] = '\0'; if(errors == 0 && state == 1){printf("STRLIT(\"%s\")\n",yytext);}if(parseState==1) return STRLIT; BEGIN INITIAL;column+=1;}
+<STRING>\"                      {yaccError = yyleng + 1;  BEGIN 0; column+=1;yytext[yyleng-1] = '\0';if(errors == 0 && state == 1){printf("STRLIT(\"%s\")\n",yytext);}if(parseState==1) return STRLIT;}
 <STRING>\n|\r\n|\r              {printf("Line %d, col %d: unterminated string literal\n",errol,erroc);BEGIN 0;resetline();}
 <STRING>\\[\\fnrt"]             {yymore();column+=2;}
-<STRING>\\		                {printf("Line %d, col %d: invalid escape sequence (\\)\n",nline,column);errors = 1;column+=1;}
-<STRING>\\[^\n\r]?		        {printf("Line %d, col %d: invalid escape sequence (\\%c)\n",nline,column,yytext[yyleng - 1]);errors = 1;column+=2;}
+<STRING>\\		                {printf("Line %d, col %d: invalid escape sequence (\\)\n",nline,column);errors = 1;column+=1;yymore();}
+<STRING>\\[^\n\r]?		        {printf("Line %d, col %d: invalid escape sequence (\\%c)\n",nline,column,yytext[yyleng - 1]);errors = 1;column+=2;yymore();}
 <STRING>.                       {yymore();column+=1;}
 
 {STARTCOMMENT_1}				{BEGIN COMMENT_1;}
@@ -124,18 +126,30 @@ IGNORE		        " "|\t|\f
 .					{printf("Line %d, col %d: illegal character (%s)\n",nline,column,yytext);column+=yyleng;}
 
 %%
+void yyerror(char *msg) {
+    printf("Line %d col %d: %s: %s\n",nline,column-yaccError,msg, yytext);
+}
+
+
 int main(int argc, char *argv[ ]){
     if(argc==2){
         char * str = "-l";
         char * parseStr = "-t";
         if(strcmp(argv[1],str)==0){
-            state=1;
+			state=1;
+			yylex();
+			return 0;
         }
-        if(strcmp(argv[1], parseStr)==0){
+        else if(strcmp(argv[1], parseStr)==0){
             parseState=1;
+            yyparse();
+
         }
     }
-    yylex();
+    else{
+        parseState=1;
+        yyparse();
+    }
     return 0;
 }
 
