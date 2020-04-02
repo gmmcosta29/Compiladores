@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "y.tab.h"
 #include <ctype.h>
+#include "functions.h"
     /*      Francisco Forte Nº2016225674
             Guilherme Costa Nº2017249276
     */
@@ -99,9 +100,9 @@ IGNORE		        " "|\t|\f
 "false"             {if (state==1)printf("BOOLLIT(false)\n");column+=yyleng;if(parseState==1) return FALSE;}
 {id}                {if (state==1)printf("ID(%s)\n",yytext);column+=yyleng;if(parseState==1) return ID;}
 
-<STRING><<EOF>>	                {printf("Line %d, col %d: unterminated string literal\n",errol,erroc);yyterminate();}
-\"                              {BEGIN(STRING);errors = 0;errol = nline;erroc = column;column+=yyleng;}
-<STRING>\"                      {yaccError = yyleng + 1;  BEGIN 0; column+=1;yytext[yyleng-1] = '\0';if(errors == 0 && state == 1){printf("STRLIT(\"%s\")\n",yytext);}if(parseState==1) return STRLIT;}
+<STRING><<EOF>>	                {column+=1;printf("Line %d, col %d: unterminated string literal\n",errol,erroc);yyterminate();}
+\"                              {BEGIN(STRING);errors = 0;errol = nline;erroc = column;column+=yyleng;yymore();}
+<STRING>\"                      {BEGIN 0; column+=1;if(errors == 0 && state == 1){printf("STRLIT(%s)\n",yytext);}if(parseState==1) return STRLIT;}
 <STRING>\n|\r\n|\r              {printf("Line %d, col %d: unterminated string literal\n",errol,erroc);BEGIN 0;resetline();}
 <STRING>\\[\\fnrt"]             {yymore();column+=2;}
 <STRING>\\		                {printf("Line %d, col %d: invalid escape sequence (\\)\n",nline,column);errors = 1;column+=1;yymore();}
@@ -112,13 +113,14 @@ IGNORE		        " "|\t|\f
 <COMMENT_1>{NEWLINE}				{BEGIN 0; resetline();}
 <COMMENT_1>.					
 
-<COMMENT><<EOF>>	    {printf("Line %d, col %d: unterminated comment\n",errol, erroc);yyterminate();} 
+<COMMENT><<EOF>>	    {column+=1;printf("Line %d, col %d: unterminated comment\n",errol, erroc);yyterminate();} 
 "/*"                   {BEGIN COMMENT;errol = nline;erroc = column;column+=yyleng;}
 <COMMENT>"*/"           {BEGIN INITIAL;column+=yyleng;}
 <COMMENT>{NEWLINE}             {resetline();}
 <COMMENT>.                      {column+=yyleng;}
 
 {IGNORE}            {column+=yyleng;}
+<<EOF>>             {column+=1;yyterminate();}
 {NEWLINE}		    {resetline();}
 
 
@@ -127,23 +129,33 @@ IGNORE		        " "|\t|\f
 
 %%
 void yyerror(char *msg) {
-    printf("Line %d col %d: %s: %s\n",nline,column-yaccError,msg, yytext);
+    printf("Line %d col %d: %s: %s\n",nline,column-yyleng,msg, yytext);
 }
 
 
 int main(int argc, char *argv[ ]){
     if(argc==2){
+        char *nStr = "-e1";
         char * str = "-l";
         char * parseStr = "-t";
+        char * nParseStr = "-e2";
         if(strcmp(argv[1],str)==0){
 			state=1;
 			yylex();
 			return 0;
         }
-        else if(strcmp(argv[1], parseStr)==0){
+        if(strcmp(argv[1],nStr)==0){
+			state=0;
+			yylex();
+			return 0;
+        }
+        if(strcmp(argv[1], parseStr)==0){
             parseState=1;
             yyparse();
-
+        }
+        if(strcmp(argv[1], nParseStr)==0){
+            parseState=1;
+            yyparse();
         }
     }
     else{

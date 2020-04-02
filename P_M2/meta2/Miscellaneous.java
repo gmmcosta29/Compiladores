@@ -8,7 +8,6 @@ class Teste {
       System.out.print("20 no projeto de TI");
       System.out.print("20 no projeto de MULTIMEDIA");
       System.out.print("20 no projeto de IRC");
-      
         if (cadeira==SCC) {
           if(0){if(0){if(0){if(0){if(0){if(0){if(0){if(0){if(0){
             System.out.print("Plagio mas depois 15");

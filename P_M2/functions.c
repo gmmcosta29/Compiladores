@@ -1,5 +1,7 @@
-#ifdef STRUCTS
-#define STRUCTS
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include "strutcs.h"
 typedef struct _expression{
     struct _expression *right;
     struct _expression *left;
@@ -100,7 +102,7 @@ typedef struct _params{
     char *type;
     char *id;
     struct *_params *next;
-}Params;
+}Params;_declaration
 
 typedef struct _method_header{
     char *type;
@@ -108,10 +110,10 @@ typedef struct _method_header{
     struct _params *params;
 }methodHeader;
 
-typedef struct _method_decl{
+typedef struct _method_dec{
     struct _method_header *methodHeader;
     struct _method_body *methodBody;
-}methodDecl;
+}methodDec;
 
 typedef struct _method_body{
     struct _statement *statement;
@@ -123,10 +125,51 @@ typedef struct _declarations{
     struct _method_dec *methodDec;
     struct _field_dec *fieldDec;
     int semicolon;
-    struct _declaration *next;
+    struct _declarations *next;
 }declarations;
 
 typedef struct _program{
-    struct _declaration *declaration;
+    struct _declarations *declaration;
 }program;
-#endif
+
+
+
+_program* insert_program(_declarations * declarationlist){
+    _program *pro = (_program*)malloc(sizeof(_program));
+    pro->declaration = declarationlist;
+    return pro;
+}
+
+_declarations* insert_declaration_list(s_declarations *head,_method_dec *methdec,_field_dec *fieldec,int semicolon){
+    _declarations *new = (_declarations*)malloc(sizeof(struct _declarations));
+    _declarations *temp;
+    if(methdec){
+
+        new->methodDec = methdec;
+        new->next = NULL;
+        if(!head){
+            return new;
+        }
+        for(temp= head;temp->next;temp = temp->next);
+        temp->next = new;
+    }else if(fieldec){
+        new->fieldDec = fieldec;
+        new->next = NULL;
+        if(!head){
+            return new;
+        }
+        for(temp= head;temp->next;temp = temp->next);
+        temp->next = new;
+    }else{
+        new->semicolon = semicolon;
+        new->next = NULL;
+        if(!head){
+            return new;
+        }
+        for(temp= head;temp->next;temp = temp->next);
+        temp->next = new;
+    }
+    return head;
+}
+
+_field_dec*
