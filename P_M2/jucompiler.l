@@ -85,7 +85,7 @@ IGNORE		        " "|\t|\f
 "["                 {if (state==1)printf("LSQ\n");column+=yyleng;if(parseState==1) return LSQ;}
 "("                 {if (state==1)printf("LPAR\n");column+=yyleng;if(parseState==1) return LPAR;}
 "<="                {if (state==1)printf("LE\n");column+=yyleng;if(parseState==1) return LE;}
-"{"                 {if (state==1)printf("LBRACE\n");column+=yyleng;if(parseState==1) return LBRACE;}
+"{"                  {if (state==1)printf("LBRACE\n");column+=yyleng;if(parseState==1) return LBRACE;}
 ">"                 {if (state==1)printf("GT\n");column+=yyleng;if(parseState==1) return GT;}
 ">="                {if (state==1)printf("GE\n");column+=yyleng;if(parseState==1) return GE;}
 "=="                {if (state==1)printf("EQ\n");column+=yyleng;if(parseState==1) return EQ;}
@@ -100,7 +100,7 @@ IGNORE		        " "|\t|\f
 
 <STRING><<EOF>>	                {column+=1;printf("Line %d, col %d: unterminated string literal\n",errol,erroc);yyterminate();}
 \"                              {BEGIN(STRING);errors = 0;errol = nline;erroc = column;column+=yyleng;yymore();}
-<STRING>\"                      {BEGIN 0; column+=1;if(errors == 0 && state == 1){printf("STRLIT(%s)\n",yytext);}if(parseState==1) return STRLIT;}
+<STRING>\"                      {BEGIN 0; column+=1;if(errors == 0 && state == 1){printf("STRLIT(%s)\n",yytext);}if(parseState==1 && errors == 0)return STRLIT;}
 <STRING>\n|\r\n|\r              {printf("Line %d, col %d: unterminated string literal\n",errol,erroc);BEGIN 0;resetline();}
 <STRING>\\[\\fnrt"]             {yymore();column+=2;}
 <STRING>\\		                {printf("Line %d, col %d: invalid escape sequence (\\)\n",nline,column);errors = 1;column+=1;yymore();}
@@ -127,7 +127,7 @@ IGNORE		        " "|\t|\f
 
 %%
 void yyerror(char *msg) {
-    printf("Line %d, col %d: %s: %s \n",nline,column-yyleng,msg, yytext);
+    printf("Line %d, col %d: %s: %s\n",nline,column-yyleng,msg, yytext);
 }
 
 

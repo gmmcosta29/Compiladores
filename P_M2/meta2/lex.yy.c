@@ -1266,7 +1266,7 @@ YY_RULE_SETUP
 case 55:
 YY_RULE_SETUP
 #line 103 "jucompiler.l"
-{BEGIN 0; column+=1;if(errors == 0 && state == 1){printf("STRLIT(%s)\n",yytext);}if(parseState==1) return STRLIT;}
+{BEGIN 0; column+=1;if(errors == 0 && state == 1){printf("STRLIT(%s)\n",yytext);}if(parseState==1 && errors == 0)return STRLIT;}
 	YY_BREAK
 case 56:
 /* rule 56 can match eol */
@@ -2367,7 +2367,7 @@ void yyfree (void * ptr )
 #line 128 "jucompiler.l"
 
 void yyerror(char *msg) {
-    printf("Line %d, col %d: %s: %s \n",nline,column-yyleng,msg, yytext);
+    printf("Line %d, col %d: %s: %s\n",nline,column-yyleng,msg, yytext);
 }
 
 

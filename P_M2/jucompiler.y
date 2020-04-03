@@ -11,7 +11,7 @@ int error_yacc=0;
 
 %}
 
-%token <id> INTLIT REALLIT STRLIT 
+%token <id> INTLIT REALLIT STRLIT ESTRING
 %token <id> ID
 %token WHILE VOID STRING1 STATIC RETURN PUBLIC PARSEINT PRINT ARROW RESERVED
 %token INT IF ELSE DOUBLE DOTLENGTH BOOL CLASS
@@ -23,6 +23,8 @@ int error_yacc=0;
 %token <id> NOT
 %token COMMA ASSIGN TRUE FALSE
 
+
+%left ASSIGN
 %left OR
 %left XOR
 %left AND
@@ -31,9 +33,7 @@ int error_yacc=0;
 %left RSHIFT LSHIFT
 %left PLUS MINUS
 %left STAR DIV MOD
-%left NOT // PLUS  MINUS também são unitárias
-%left ASSIGN
-
+%left NOT // PLUS  MINUS também são unitárias BATATA
 %type <id>MethodInvocation
 
 
@@ -87,37 +87,40 @@ VarCommaIdAux: VarCommaIdAux COMMA ID
         |
 ;
 Statement: LBRACE StatementAux RBRACE     
-        | IF LPAR Expr RPAR Statement %prec LOWER_THAN_ELSE  
-        | IF LPAR Expr RPAR Statement ELSE Statement
-        | WHILE LPAR Expr RPAR Statement
-        | RETURN Expr SEMICOLON 
+        | IF LPAR Expression RPAR Statement %prec LOWER_THAN_ELSE  
+        | IF LPAR Expression RPAR Statement ELSE Statement
+        | WHILE LPAR Expression RPAR Statement
+        | RETURN Expression SEMICOLON 
         | RETURN SEMICOLON
         | SEMICOLON
         | MethodInvocation SEMICOLON
         | Assignment SEMICOLON
         | ParseArgs SEMICOLON
-        | PRINT LPAR Expr RPAR SEMICOLON                       
+        | PRINT LPAR Expression RPAR SEMICOLON                       
         | PRINT LPAR STRLIT RPAR SEMICOLON                           
         | error SEMICOLON
 ;
 StatementAux: StatementAux Statement 
         |
 ;
-AuxExprComma: AuxExprComma COMMA Expr       
+AuxExprComma: AuxExprComma COMMA Expression       
         |
 ;
-AuxExpr: Expr AuxExprComma 
+AuxExpr: Expression AuxExprComma 
         |
 ;
 MethodInvocation: ID LPAR AuxExpr RPAR
-                | ID LPAR error RPAR                                     
+                | ID LPAR error RPAR                          
 ;
-Assignment: ID ASSIGN Expr 
+Assignment: ID ASSIGN Expression 
 ;
-ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ RPAR
+ParseArgs: PARSEINT LPAR ID LSQ Expression RSQ RPAR
         | PARSEINT LPAR error RPAR
 ;
-Expr: InitialExpr TextExpr
+Expression: Expr
+        |Assignment
+;
+Expr:  TextExpr
         |Expr OR Expr
         |Expr AND Expr
         |Expr LT Expr
@@ -134,15 +137,13 @@ Expr: InitialExpr TextExpr
         |Expr XOR Expr
         |Expr LSHIFT Expr
         |Expr RSHIFT Expr
+        |PLUS Expr 
+        |MINUS Expr
+        |NOT Expr
 ;
-InitialExpr: InitialExpr PLUS
-        |InitialExpr MINUS
-        |InitialExpr NOT 
-        |
-;
-TextExpr:LPAR Expr RPAR
+
+TextExpr:LPAR Expression RPAR
         |MethodInvocation
-        |Assignment
         |ParseArgs
         |ID DOTLENGTH
         |ID
