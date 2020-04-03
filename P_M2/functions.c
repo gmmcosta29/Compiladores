@@ -55,7 +55,7 @@ typedef struct _parse_args{
 
 typedef struct _return{
     struct _expression *expression;
-}returnblock;
+}returnBlock;
 
 typedef struct _assign{
     char *id;
@@ -76,7 +76,7 @@ typedef struct _print{
 typedef struct _while{
     struct _expression *expression;
     struct _list_statement *listStatement;
-}whileblock;
+}whileBlock;
 
 typedef struct _var_dec{
     char *type;
@@ -90,7 +90,7 @@ typedef struct _list_var_dec{
 
 typedef struct _field_dec{
     char *type;
-    struct __list_field_dec *listFieldDec;
+    struct _list_field_dec *listFieldDec;
 }fieldDec;
 
 typedef struct _list_field_dec{
@@ -102,7 +102,7 @@ typedef struct _params{
     char *type;
     char *id;
     struct *_params *next;
-}Params;_declaration
+}params;
 
 typedef struct _method_header{
     char *type;
@@ -132,44 +132,110 @@ typedef struct _program{
     struct _declarations *declaration;
 }program;
 
-
-
-_program* insert_program(_declarations * declarationlist){
-    _program *pro = (_program*)malloc(sizeof(_program));
+program* insertProgram(declarations *declarationlist){
+    program *pro = (program*)malloc(sizeof(program));
     pro->declaration = declarationlist;
     return pro;
 }
 
-_declarations* insert_declaration_list(s_declarations *head,_method_dec *methdec,_field_dec *fieldec,int semicolon){
-    _declarations *new = (_declarations*)malloc(sizeof(struct _declarations));
-    _declarations *temp;
+declarations* insertDeclarationList(declarations *head,methodDec *methdec,fieldDec *fieldec,int semicolon){
+    declarations *new = (declarations*)malloc(sizeof(declarations)),*temp;
+    new->next = NULL;
     if(methdec){
-
+        new->semicolon = 0;
+        new->fieldDec = NULL;
         new->methodDec = methdec;
-        new->next = NULL;
-        if(!head){
-            return new;
-        }
-        for(temp= head;temp->next;temp = temp->next);
-        temp->next = new;
     }else if(fieldec){
+        new->semicolon = 0;
+        new->methodDec = NULL;
         new->fieldDec = fieldec;
-        new->next = NULL;
-        if(!head){
-            return new;
-        }
-        for(temp= head;temp->next;temp = temp->next);
-        temp->next = new;
     }else{
+        new->methodDec = NULL;
+        new->fieldDec = NULL;
         new->semicolon = semicolon;
-        new->next = NULL;
-        if(!head){
-            return new;
-        }
-        for(temp= head;temp->next;temp = temp->next);
-        temp->next = new;
     }
+    if(!head){
+        return new;
+    }
+    for(temp= head;temp->next;temp = temp->next);
+    temp->next = new;
     return head;
 }
 
-_field_dec*
+fieldDec* insertFieldDec(char *type, listFieldDec *fieldlist){
+    fieldDec *new =(fieldDec*)malloc(sizeof(fieldDec));
+    new->type = (char *)strdup(type);
+    new->listFieldDec = fieldlist;
+    return new;
+}
+listFieldDec* insertListFieldDec(listFieldDec head,char *id){
+    listFieldDec *new = (listFieldDec*)malloc(sizeof(listFieldDec)),*temp;
+    new->id = (char*)strdup(id);
+    new->next =NULL;
+
+    if(head){
+        for(temp = head;temp->next;temp = temp->next);
+        temp->next = new;
+        return head;
+    }
+    return new;
+}
+methodDec* insertMethodDec(methodBody *body,methodHeader *header){
+    methodDec *new = (methodDec*)malloc(sizeof(methodDec));
+
+    new ->methodBody = body;
+    new->methodHeader = header;
+    return new;
+}
+
+methodHeader* insertMethodHeader(char *type,char *id,params *params){
+    methodHeader *new = (methodHeader*)malloc(sizeof(methodHeader));
+
+    new->id = (char*)strdup(id);
+    new->type = (char*)strdup(type);
+    new->params = params;
+    return new;
+}
+params * insertParams(params *head,char *id,char *type){
+    params * new = (params*)malloc(sizeof(params));
+    new->type = (char *)strdup(type);
+    new->id =(char *)strdup(id);
+    new->next = NULL;
+    if(!head){
+        return  new;
+    }
+    for(temp = head,temp->next;temp = temp->next);
+    temp->next = new;
+    return head;
+}
+methodBody * insertMethodBody(methodBody *head,varDec *var,statement * state){
+    methodBody * new = (methodBody*)malloc(sizeof(methodBody)),*temp;
+    new->next = NULL;
+    if(var){
+        new->varDec = var;
+        new->statement = NULL;
+    }else{
+        new->statement = state;
+        new->varDec = NULL;
+    }
+    if(!head) return new;
+    for(temp = head;temp->next;temp = temp->next);
+    temp->next = new;
+    return head;
+}
+varDec *insertVarDec(char *type,listVarDec *list){
+    varDec *new = (varDec*)malloc(sizeof(varDec));
+    new->listVarDec= list;
+    new->type = (char *)strdup(type);
+    return new;
+}
+listVarDec * insertListVarDec(listVarDec *head,char *id){
+    listVarDec *new = (listVarDec*)malloc(sizeof(listVarDec)),*temp;
+    new->id = (char*)strdup(id);
+    new->next =NULL;
+    if(!head) return new;
+    for(temp = head;temp->next;temp = temp->next);
+    temp->next = new;
+    return head;
+}
+

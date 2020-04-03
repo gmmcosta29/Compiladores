@@ -53,7 +53,7 @@ typedef struct _parse_args{
 
 typedef struct _return{
     struct _expression *expression;
-}returnblock;
+}returnBlock;
 
 typedef struct _assign{
     char *id;
@@ -74,7 +74,7 @@ typedef struct _print{
 typedef struct _while{
     struct _expression *expression;
     struct _list_statement *listStatement;
-}whileblock;
+}whileBlock;
 
 typedef struct _var_dec{
     char *type;
@@ -88,7 +88,7 @@ typedef struct _list_var_dec{
 
 typedef struct _field_dec{
     char *type;
-    struct __list_field_dec *listFieldDec;
+    struct _list_field_dec *listFieldDec;
 }fieldDec;
 
 typedef struct _list_field_dec{
@@ -100,7 +100,7 @@ typedef struct _params{
     char *type;
     char *id;
     struct *_params *next;
-}Params;
+}params;
 
 typedef struct _method_header{
     char *type;
@@ -108,10 +108,10 @@ typedef struct _method_header{
     struct _params *params;
 }methodHeader;
 
-typedef struct _method_decl{
+typedef struct _method_dec{
     struct _method_header *methodHeader;
     struct _method_body *methodBody;
-}methodDecl;
+}methodDec;
 
 typedef struct _method_body{
     struct _statement *statement;
@@ -123,10 +123,10 @@ typedef struct _declarations{
     struct _method_dec *methodDec;
     struct _field_dec *fieldDec;
     int semicolon;
-    struct _declaration *next;
+    struct _declarations *next;
 }declarations;
 
 typedef struct _program{
-    struct _declaration *declaration;
+    struct _declarations *declaration;
 }program;
 #endif
