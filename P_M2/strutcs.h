@@ -3,7 +3,7 @@
 typedef struct _expression{
     struct _expression *right;
     struct _expression *left;
-    char *operator;structs
+    char *operator;
     char *intlit;
     char *realit;
     char *id;
@@ -12,6 +12,7 @@ typedef struct _expression{
     struct _method_invocation *methodInvocation;
     struct _assignment *assignment;
     struct _parse_args *parseArgs;
+    struct _list_expression *expressions_head;
 }expression;
 
 typedef struct  _expr_initial{
@@ -62,8 +63,8 @@ typedef struct _assign{
 
 typedef struct _if{
     struct _expression *expression;
-    struct _list_statement *listState;
-    struct _list_statement *listElseState;
+    struct _statement *listState;
+    struct _statement *listElseState;
 }ifBlock;
 
 typedef struct _print{
@@ -73,7 +74,7 @@ typedef struct _print{
 
 typedef struct _while{
     struct _expression *expression;
-    struct _list_statement *listStatement;
+    struct _statement *listStatement;
 }whileBlock;
 
 typedef struct _var_dec{
@@ -129,4 +130,5 @@ typedef struct _declarations{
 typedef struct _program{
     struct _declarations *declaration;
 }program;
+
 #endif
