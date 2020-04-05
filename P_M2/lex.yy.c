@@ -696,7 +696,7 @@ char *yytext;
     int parseState = 0;
     int errol = 1;
     int erroc = 1;
-
+    extern program* programafinal;
   void resetline(){
   	nline++;
 	column=1;
@@ -998,37 +998,37 @@ YY_RULE_SETUP
 case 2:
 YY_RULE_SETUP
 #line 46 "jucompiler.l"
-{if (state==1)printf("INTLIT(0)\n");column+=yyleng;if(parseState==1) return INTLIT;}
+{if (state==1)printf("INTLIT(0)\n");column+=yyleng;if(parseState==1)yylval.id=strdup(yytext); return INTLIT;}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
 #line 47 "jucompiler.l"
-{if (state==1)printf("INTLIT(%s)\n",yytext);column+=yyleng;if(parseState==1) return INTLIT;}
+{if (state==1)printf("INTLIT(%s)\n",yytext);column+=yyleng;if(parseState==1)yylval.id=strdup(yytext); return INTLIT;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
 #line 48 "jucompiler.l"
-{if (state==1)printf("INTLIT(%s)\n",yytext);column+=yyleng;if(parseState==1) return INTLIT;}
+{if (state==1)printf("INTLIT(%s)\n",yytext);column+=yyleng;if(parseState==1)yylval.id=strdup(yytext); return INTLIT;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
 #line 51 "jucompiler.l"
-{if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;if(parseState==1) return REALLIT;}
+{if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;if(parseState==1)yylval.id=strdup(yytext); return REALLIT;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
 #line 52 "jucompiler.l"
-{if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;if(parseState==1) return REALLIT;}
+{if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;if(parseState==1)yylval.id=strdup(yytext); return REALLIT;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
 #line 53 "jucompiler.l"
-{if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;if(parseState==1) return REALLIT;}
+{if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;if(parseState==1)yylval.id=strdup(yytext); return REALLIT;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
 #line 54 "jucompiler.l"
-{if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;if(parseState==1) return REALLIT;}
+{if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;if(parseState==1)yylval.id=strdup(yytext); return REALLIT;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
@@ -1253,7 +1253,7 @@ YY_RULE_SETUP
 case 53:
 YY_RULE_SETUP
 #line 100 "jucompiler.l"
-{if (state==1)printf("ID(%s)\n",yytext);column+=yyleng;if(parseState==1) return ID;}
+{if (state==1)printf("ID(%s)\n",yytext);column+=yyleng;if(parseState==1)yylval.id=strdup(yytext); return ID;}
 	YY_BREAK
 case YY_STATE_EOF(STRING):
 #line 102 "jucompiler.l"
@@ -1267,7 +1267,7 @@ YY_RULE_SETUP
 case 55:
 YY_RULE_SETUP
 #line 104 "jucompiler.l"
-{BEGIN 0; column+=1;if(errors == 0 && state == 1){printf("STRLIT(%s)\n",yytext);}if(parseState==1 && errors == 0)return STRLIT;}
+{BEGIN 0; column+=1;if(errors == 0 && state == 1){printf("STRLIT(%s)\n",yytext);}if(parseState==1 && errors == 0)yylval.id=strdup(yytext);return STRLIT;}
 	YY_BREAK
 case 56:
 /* rule 56 can match eol */
@@ -2400,6 +2400,7 @@ int main(int argc, char *argv[ ]){
     else{
         parseState=1;
         yyparse();
+        printTree(programafinal);
     }
     return 0;
 }

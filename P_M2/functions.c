@@ -5,9 +5,10 @@
 #include "functions.h"
 
 
-program* insertProgram(declarations *declarationlist){
+program* insertProgram(char *id,declarations *declarationlist){
     program *pro = (program*)malloc(sizeof(program));
     pro->declaration = declarationlist;
+    pro->id = (char*)strdup(id);
     return pro;
 }
 
@@ -103,13 +104,12 @@ varDec *insertVarDec(char *type,listVarDec *list){
     return new;
 }
 listVarDec * insertListVarDec(listVarDec *head,char *id){
-    listVarDec *new = (listVarDec*)malloc(sizeof(listVarDec)),*temp;
+    listVarDec *new = (listVarDec*)malloc(sizeof(listVarDec));
     new->id = (char*)strdup(id);
     new->next =NULL;
     if(!head) return new;
-    for(temp = head;temp->next;temp = temp->next);
-    temp->next = new;
-    return head;
+    new->next = head;
+    return new;
 }
 void resetStatement(statement *statement1){
     statement1->semicolon = 0;
@@ -238,7 +238,7 @@ expression* insertAssignment(assignment *assign1){
 void resetExpression(expression *expression1){
     expression1->assignment =NULL;
     expression1->id = NULL;
-    expression1->expressions_list = NULL;
+    expression1->expressionext = NULL;
     expression1->parseArgs = NULL;
     expression1->methodInvocation = NULL;
     expression1->boollit = NULL;
@@ -248,19 +248,13 @@ void resetExpression(expression *expression1){
     expression1->operator = NULL;
     expression1->realit = NULL;
     expression1->right = NULL;
-}                           
+}
 
-expression *insertMultipleExpression(expression *headexpression,expression *newexpression){
-    listExpression *new  = (listExpression *)malloc(sizeof(listExpression)),*aux = headexpression->expressions_list;
-    new->expression = newexpression;
-    new->next = NULL;
-    if(aux){
-        for(;aux->next;aux = aux->next);
-        aux->next = new;
-    }else{
-        aux = new;
-    }
-    return headexpression;
+expression *insertMultipleExpression(expression *newexpression){
+    expression *new  = (expression *)malloc(sizeof(expression));
+    resetExpression(new);
+    new->expressionext = newexpression;
+    return new;
 }
 expression *insertOperator(expression *expression1,char *operator,expression *expression2){
     expression *new = (expression*)malloc(sizeof(expression));
@@ -281,6 +275,7 @@ expression* insertUnitary(char *operator,expression *expression1){
 
 expression* insertExpression(methodInvocation *methodInvocation1,parseArgs *parseArgs1,  int dotlength, char * id, char *intlit, char * boolit, char * reallit){
     expression *new = (expression*)malloc(sizeof(expression));
+    resetExpression(new);
     new->methodInvocation = methodInvocation1;
     new->parseArgs = parseArgs1;
     new->id = (char *)strdup(id);
@@ -291,4 +286,243 @@ expression* insertExpression(methodInvocation *methodInvocation1,parseArgs *pars
     return new;
 
 }
+int nivel = 0;
 
+void printpoints(){
+    int i;
+    for ( i = 0; i < nivel * 2; i++){
+        printf(".");
+    }
+}
+
+
+void printTree(program *pro){
+    printf("Program\n");
+    nivel++;
+    printpoints();
+    printf("Id(%s)\n",pro->id);
+    if(!pro->declaration){
+        return;
+    }
+    while(pro->declaration){
+        if(pro->declaration->methodDec){
+            printMethodDecl(pro->declaration->methodDec);
+        }else if(pro->declaration->fieldDec){
+            printFieldDecl(pro->declaration->fieldDec);
+        }
+        pro->declaration = pro->declaration->next;
+    }
+    nivel--;
+    return;
+}
+
+void printMethodDecl(methodDec *base){
+    printpoints();
+    printf("MethodDecl\n");
+    nivel++;
+
+    printpoints();
+    printf("MethodHeader\n");
+    nivel++;
+
+    printpoints();
+    printf("%s\n",base->methodHeader->type);
+
+    printpoints();
+    printf("Id(%s)\n",base->methodHeader->id);
+    
+
+
+    printpoints();
+    printf("MethodParams\n");
+    if(base->methodHeader->params){
+        nivel++;
+        nivel++;
+        while(base->methodHeader->params){
+            nivel--;
+            printpoints();
+            printf("ParamDecl\n");
+            nivel++;
+            printpoints();
+            printf("%s\n",base->methodHeader->params->type);
+            printpoints();
+            printf("Id(%s)\n",base->methodHeader->params->id);
+            base->methodHeader->params = base->methodHeader->params->next;
+        }
+        nivel--;
+        nivel--;
+    }
+    nivel--;
+    printpoints();
+    printf("MethodBody\n");
+    nivel++;
+    if(base->methodBody){
+        printMethodBody(base->methodBody);
+    }
+    nivel--;
+    nivel--;
+}
+
+void printMethodBody(methodBody * aux){
+    while(aux){
+        if(aux->statement){
+            printStatement(aux->statement);
+        }else if (aux->varDec){
+            printVarDecl(aux->varDec);
+        }
+        aux = aux->next;
+    }
+}
+
+void printVarDecl(varDec *aux){
+        listVarDec *temp = aux->listVarDec;
+        while(temp){
+            printpoints();
+            printf("VarDecl\n");
+            nivel++;
+            printpoints();
+            printf("%s\n", aux->type);
+            printpoints();
+            printf("Id(%s)\n", temp->id);
+            temp = temp->next;
+            nivel--;
+        }
+        return;
+}
+void printFieldDecl(fieldDec *aux){
+        printpoints();
+        printf("FieldDecl\n");
+        nivel++;
+        printpoints();
+        printf("%s\n", aux->type);
+        listFieldDec *temp = aux->listFieldDec;
+        while(temp){
+            printpoints();
+            printf("Id(%s)\n", aux->listFieldDec->id);
+            temp = temp->next;
+        }
+        nivel--;
+        return;
+}
+void printStatement(statement *state){
+    if(state->print){
+        printpoints();
+        printf("Print\n");
+        nivel++;
+        if(state->print->stringlit){
+            printpoints();
+            printf("StrLit(%s)\n",state->print->stringlit);
+        }
+        else if(state->print->expression){
+            printExpression(state->print->expression);
+        }
+        nivel--;
+        return;
+    }
+    if(state->methodInvoc){
+        printpoints();
+        printf("Call\n");
+        nivel++;
+        printf("Id(%s)\n",state->methodInvoc->id);
+        while(state->methodInvoc->listExpression){
+            printExpression(state->methodInvoc->listExpression->expression);
+            state->methodInvoc->listExpression = state->methodInvoc->listExpression->next;
+        }
+        nivel--;
+        return;
+    }
+    if(state->parseArgs){
+        printpoints();
+        printf("ParseArgs\n");
+        nivel++;
+        printpoints();
+        printf("Id(%s)\n",state->parseArgs->id);
+        printExpression(state->parseArgs->expression);
+        nivel--;
+        return;
+    }
+    if(state->assignment){
+        printpoints();
+        printf("Assign\n");
+        nivel++;
+        printpoints();
+        printf("Id(%s)\n",state->assignment->id);
+        printExpression(state->assignment->expression);
+        nivel--;
+        return;
+    }
+    if(state->ifBlock){
+        int numero = countStatement(state->ifBlock->listState) + countStatement(state->ifBlock->listElseState);
+        printpoints();
+        printf("If\n");
+        printExpression(state->ifBlock->expression);
+        if(numero >1){
+            printpoints();
+            printf("Block\n");
+            nivel++;
+            printStatement(state->ifBlock->listState);
+            nivel--;
+            printStatement(state->ifBlock->listElseState);
+        }else if(numero == 1){
+            nivel++;
+            printStatement(state->ifBlock->listState);
+            printpoints();
+            printf("Block\n");
+        }else{
+            printpoints();
+            printf("Block\n");
+            printpoints();
+            printf("Block\n");
+        }
+        nivel--;
+        return;
+    }
+    if(state->whileBlock){
+        printpoints();
+        printf("While\n");
+        printExpression(state->whileBlock->expression);
+        nivel++;
+        printStatement(state->whileBlock->listStatement);
+        nivel--;
+        return;
+    }
+    if(state->returnblock){
+        printpoints();
+        printf("Return\n");
+        printExpression(state->returnblock->expression);
+        nivel--;
+        return;
+    }
+    if(state->listStatement){
+        while(state->listStatement){
+            printStatement(state->listStatement->statement);
+            state->listStatement = state->listStatement->next;
+        }
+    }
+}
+
+int countStatement(statement *state){
+    int i = 0;
+    listStatement *temp = state->listStatement;
+    if(!temp){
+        return 0;
+    }
+    while(temp){
+        i++;
+        if(i > 1){
+            return 2;
+        }
+        temp = temp->next;
+    }
+    return 1;
+}
+
+void printExpression(expression *expr){
+    printpoints();
+    printf("Expression\n");
+    if(!expr->operator){
+            //expressao final
+    }else{
+            //expressao nao final
+    }
+}

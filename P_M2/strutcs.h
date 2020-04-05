@@ -15,7 +15,7 @@ typedef struct _expression{
     struct _method_invocation *methodInvocation;
     struct _assignment *assignment;
     struct _parse_args *parseArgs;
-    struct _list_expression *expressions_list;
+    struct _expression *expressionext;
 }expression;
 
 typedef struct  _expr_initial{
@@ -131,6 +131,7 @@ typedef struct _declarations{
 }declarations;
 
 typedef struct _program{
+    char *id;
     struct _declarations *declaration;
 }program;
 #endif

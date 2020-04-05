@@ -75,7 +75,7 @@ int yylex (void);
 void yyerror(char *s);
 int error_yacc=0;
 
-
+program *programafinal;
 
 #line 81 "y.tab.c" /* yacc.c:339  */
 
@@ -223,11 +223,28 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 44 "jucompiler.y" /* yacc.c:355  */
+#line 62 "jucompiler.y" /* yacc.c:355  */
 
     char *id;
+    program *programVar;
+    declarations *declarationsVar;
+    methodDec *methodDecVar;
+    fieldDec *fieldDecVar;
+    listFieldDec *listFieldDecVar;
+    methodHeader *methodHeaderVar;
+    params *paramsVar;
+    methodBody *methodBodyVar;
+    varDec *varDecVar;
+    listVarDec *listVarDecVar;
+    statement *statementVar;
+    listStatement *listStatementVar;
+    listExpression *listExpressionVar;
+    methodInvocation *methodInvocationVar;
+    assignment *assignmentVar;
+    parseArgs *parseArgsVar;
+    expression *expressionVar;
 
-#line 231 "y.tab.c" /* yacc.c:355  */
+#line 248 "y.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -244,7 +261,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 248 "y.tab.c" /* yacc.c:358  */
+#line 265 "y.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -546,15 +563,15 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    48,    48,    50,    51,    52,    53,    55,    57,    58,
-      60,    62,    63,    65,    65,    65,    67,    68,    70,    71,
-      72,    74,    75,    77,    79,    80,    81,    83,    86,    88,
-      89,    91,    92,    93,    94,    95,    96,    97,    98,    99,
-     100,   101,   102,   103,   105,   106,   108,   109,   111,   112,
-     114,   115,   117,   119,   120,   122,   123,   125,   126,   127,
-     128,   129,   130,   131,   132,   133,   134,   135,   136,   137,
-     138,   139,   140,   141,   142,   143,   144,   147,   148,   149,
-     150,   151,   152,   153,   154,   155,   156
+       0,    83,    83,    85,    86,    87,    88,    90,    92,    93,
+      95,    97,    98,   100,   101,   102,   104,   105,   107,   108,
+     109,   111,   112,   114,   116,   117,   118,   120,   123,   125,
+     126,   128,   129,   130,   131,   132,   133,   134,   135,   136,
+     137,   138,   139,   140,   142,   143,   145,   146,   148,   149,
+     151,   152,   154,   156,   157,   159,   160,   162,   163,   164,
+     165,   166,   167,   168,   169,   170,   171,   172,   173,   174,
+     175,   176,   177,   178,   179,   180,   181,   184,   185,   186,
+     187,   188,   189,   190,   191,   192,   193
 };
 #endif
 
@@ -1479,8 +1496,518 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-      
-#line 1484 "y.tab.c" /* yacc.c:1646  */
+        case 2:
+#line 83 "jucompiler.y" /* yacc.c:1646  */
+    { (yyval.programVar) = programafinal = insertProgram((yyvsp[-3].id),(yyvsp[-1].declarationsVar));}
+#line 1503 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 3:
+#line 85 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.declarationsVar) = insertDeclarationList((yyvsp[-1].declarationsVar),(yyvsp[0].methodDecVar),NULL,0);}
+#line 1509 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 4:
+#line 86 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.declarationsVar) = insertDeclarationList((yyvsp[-1].declarationsVar),NULL,(yyvsp[0].fieldDecVar),0);}
+#line 1515 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 5:
+#line 87 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.declarationsVar) = insertDeclarationList((yyvsp[-1].declarationsVar),NULL,NULL,1);}
+#line 1521 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 6:
+#line 88 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.declarationsVar) = NULL;}
+#line 1527 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 7:
+#line 90 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.methodDecVar) = insertMethodDec((yyvsp[0].methodBodyVar),(yyvsp[-1].methodHeaderVar));}
+#line 1533 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 8:
+#line 92 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.fieldDecVar) = insertFieldDec((yyvsp[-2].id),(yyvsp[-1].listFieldDecVar));}
+#line 1539 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 9:
+#line 93 "jucompiler.y" /* yacc.c:1646  */
+    {error_yacc = 1;(yyval.fieldDecVar) = NULL;}
+#line 1545 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 10:
+#line 95 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.listFieldDecVar) = insertListFieldDec((yyvsp[0].listFieldDecVar),(yyvsp[-1].id));}
+#line 1551 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 11:
+#line 97 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.listFieldDecVar) = insertListFieldDec((yyvsp[-2].listFieldDecVar),(yyvsp[0].id));}
+#line 1557 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 12:
+#line 98 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.listFieldDecVar) = NULL;}
+#line 1563 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 13:
+#line 100 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.id) = "Bool";}
+#line 1569 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 14:
+#line 101 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.id) = "Int";}
+#line 1575 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 15:
+#line 102 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.id) = "Double";}
+#line 1581 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 16:
+#line 104 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.methodHeaderVar) = insertMethodHeader((yyvsp[-4].id),(yyvsp[-3].id),(yyvsp[-1].paramsVar));}
+#line 1587 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 17:
+#line 105 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.methodHeaderVar) = insertMethodHeader("Void",(yyvsp[-3].id),(yyvsp[-1].paramsVar));}
+#line 1593 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 18:
+#line 107 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.paramsVar) = insertParams((yyvsp[0].paramsVar),(yyvsp[-1].id),(yyvsp[-2].id));}
+#line 1599 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 19:
+#line 108 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.paramsVar) = insertParams(NULL,(yyvsp[0].id),"StringArray");}
+#line 1605 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 20:
+#line 109 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.paramsVar) = NULL;}
+#line 1611 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 21:
+#line 111 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.paramsVar) = insertParams((yyvsp[-3].paramsVar),(yyvsp[0].id),(yyvsp[-1].id));}
+#line 1617 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 22:
+#line 112 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.paramsVar) = NULL;}
+#line 1623 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 23:
+#line 114 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.methodBodyVar) = (yyvsp[-1].methodBodyVar);}
+#line 1629 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 24:
+#line 116 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.methodBodyVar) = insertMethodBody((yyvsp[-1].methodBodyVar),NULL,(yyvsp[0].statementVar));}
+#line 1635 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 25:
+#line 117 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.methodBodyVar) = insertMethodBody((yyvsp[-1].methodBodyVar),(yyvsp[0].varDecVar),NULL);}
+#line 1641 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 26:
+#line 118 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.methodBodyVar) = NULL;}
+#line 1647 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 27:
+#line 120 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.varDecVar) = insertVarDec((yyvsp[-2].id),(yyvsp[-1].listVarDecVar));}
+#line 1653 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 28:
+#line 123 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.listVarDecVar) = insertListVarDec((yyvsp[0].listVarDecVar),(yyvsp[-1].id));}
+#line 1659 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 29:
+#line 125 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.listVarDecVar) = insertListVarDec((yyvsp[-2].listVarDecVar),(yyvsp[0].id));}
+#line 1665 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 30:
+#line 126 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.listVarDecVar) = NULL;}
+#line 1671 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 31:
+#line 128 "jucompiler.y" /* yacc.c:1646  */
+    { (yyval.statementVar) = insertListStatement((yyvsp[-1].listStatementVar));}
+#line 1677 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 32:
+#line 129 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.statementVar) = insertIfElse((yyvsp[-2].expressionVar),(yyvsp[0].statementVar),NULL);}
+#line 1683 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 33:
+#line 130 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.statementVar) = insertIfElse((yyvsp[-4].expressionVar),(yyvsp[-2].statementVar),(yyvsp[0].statementVar));}
+#line 1689 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 34:
+#line 131 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.statementVar) = insertWhile((yyvsp[-2].expressionVar),(yyvsp[0].statementVar));}
+#line 1695 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 35:
+#line 132 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.statementVar) = insertReturn((yyvsp[-1].expressionVar));}
+#line 1701 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 36:
+#line 133 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.statementVar) = insertReturn(NULL);}
+#line 1707 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 37:
+#line 134 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.statementVar) = NULL;}
+#line 1713 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 38:
+#line 135 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.statementVar) = insertMethodInvocationStatement((yyvsp[-1].methodInvocationVar));}
+#line 1719 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 39:
+#line 136 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.statementVar) = insertAssignStatement((yyvsp[-1].assignmentVar));}
+#line 1725 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 40:
+#line 137 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.statementVar) = insertParseArgsStatement((yyvsp[-1].parseArgsVar));}
+#line 1731 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 41:
+#line 138 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.statementVar) = insertPrint((yyvsp[-2].expressionVar),NULL);}
+#line 1737 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 42:
+#line 139 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.statementVar) = insertPrint(NULL,(yyvsp[-2].id));}
+#line 1743 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 43:
+#line 140 "jucompiler.y" /* yacc.c:1646  */
+    {error_yacc = 1;(yyval.statementVar) = NULL;}
+#line 1749 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 44:
+#line 142 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.listStatementVar) = insertMultipleStatement((yyvsp[-1].listStatementVar),(yyvsp[0].statementVar));}
+#line 1755 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 45:
+#line 143 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.listStatementVar) = NULL;}
+#line 1761 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 46:
+#line 145 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.listExpressionVar) = insertListExpression((yyvsp[-2].listExpressionVar), (yyvsp[0].expressionVar));}
+#line 1767 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 47:
+#line 146 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.listExpressionVar) = NULL;}
+#line 1773 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 48:
+#line 148 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.listExpressionVar) = insertListExpression((yyvsp[0].listExpressionVar), (yyvsp[-1].expressionVar));}
+#line 1779 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 49:
+#line 149 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.listExpressionVar) = NULL;}
+#line 1785 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 50:
+#line 151 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.methodInvocationVar) = insertMethodInvocation((yyvsp[-3].id), (yyvsp[-1].listExpressionVar));}
+#line 1791 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 51:
+#line 152 "jucompiler.y" /* yacc.c:1646  */
+    {error_yacc = 1; (yyval.methodInvocationVar) = NULL;}
+#line 1797 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 52:
+#line 154 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.assignmentVar) = insertAssign((yyvsp[-2].id), (yyvsp[0].expressionVar));}
+#line 1803 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 53:
+#line 156 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.parseArgsVar) = insertParseArgs((yyvsp[-4].id), (yyvsp[-2].expressionVar));}
+#line 1809 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 54:
+#line 157 "jucompiler.y" /* yacc.c:1646  */
+    {error_yacc = 1; (yyval.parseArgsVar) = NULL;}
+#line 1815 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 55:
+#line 159 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.expressionVar) = (yyvsp[0].expressionVar);}
+#line 1821 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 56:
+#line 160 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.expressionVar) = insertAssignment((yyvsp[0].assignmentVar));}
+#line 1827 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 57:
+#line 162 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.expressionVar) = (yyvsp[0].expressionVar);}
+#line 1833 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 58:
+#line 163 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.expressionVar) = insertOperator((yyvsp[-2].expressionVar), "Or", (yyvsp[0].expressionVar));}
+#line 1839 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 59:
+#line 164 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.expressionVar) = insertOperator((yyvsp[-2].expressionVar), "And", (yyvsp[0].expressionVar));}
+#line 1845 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 60:
+#line 165 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.expressionVar) = insertOperator((yyvsp[-2].expressionVar), "Lt", (yyvsp[0].expressionVar));}
+#line 1851 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 61:
+#line 166 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.expressionVar) = insertOperator((yyvsp[-2].expressionVar), "Gt", (yyvsp[0].expressionVar));}
+#line 1857 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 62:
+#line 167 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.expressionVar) = insertOperator((yyvsp[-2].expressionVar), "Eq", (yyvsp[0].expressionVar));}
+#line 1863 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 63:
+#line 168 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.expressionVar) = insertOperator((yyvsp[-2].expressionVar), "Ne", (yyvsp[0].expressionVar));}
+#line 1869 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 64:
+#line 169 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.expressionVar) = insertOperator((yyvsp[-2].expressionVar), "Le", (yyvsp[0].expressionVar));}
+#line 1875 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 65:
+#line 170 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.expressionVar) = insertOperator((yyvsp[-2].expressionVar), "Ge", (yyvsp[0].expressionVar));}
+#line 1881 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 66:
+#line 171 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.expressionVar) = insertOperator((yyvsp[-2].expressionVar), "Plus", (yyvsp[0].expressionVar));}
+#line 1887 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 67:
+#line 172 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.expressionVar) = insertOperator((yyvsp[-2].expressionVar), "Minus", (yyvsp[0].expressionVar));}
+#line 1893 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 68:
+#line 173 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.expressionVar) = insertOperator((yyvsp[-2].expressionVar), "Star", (yyvsp[0].expressionVar));}
+#line 1899 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 69:
+#line 174 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.expressionVar) = insertOperator((yyvsp[-2].expressionVar), "Div", (yyvsp[0].expressionVar));}
+#line 1905 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 70:
+#line 175 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.expressionVar) = insertOperator((yyvsp[-2].expressionVar), "Mod", (yyvsp[0].expressionVar));}
+#line 1911 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 71:
+#line 176 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.expressionVar) = insertOperator((yyvsp[-2].expressionVar), "Xor", (yyvsp[0].expressionVar));}
+#line 1917 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 72:
+#line 177 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.expressionVar) = insertOperator((yyvsp[-2].expressionVar), "Lshift", (yyvsp[0].expressionVar));}
+#line 1923 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 73:
+#line 178 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.expressionVar) = insertOperator((yyvsp[-2].expressionVar), "Rshift", (yyvsp[0].expressionVar));}
+#line 1929 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 74:
+#line 179 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.expressionVar) = insertUnitary("Plus", (yyvsp[0].expressionVar));}
+#line 1935 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 75:
+#line 180 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.expressionVar) = insertUnitary("Minus", (yyvsp[0].expressionVar));}
+#line 1941 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 76:
+#line 181 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.expressionVar) = insertUnitary("Not", (yyvsp[0].expressionVar));}
+#line 1947 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 77:
+#line 184 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.expressionVar) = insertMultipleExpression((yyvsp[-1].expressionVar));}
+#line 1953 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 78:
+#line 185 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.expressionVar) = insertExpression((yyvsp[0].methodInvocationVar), NULL, 0, NULL, NULL, NULL, NULL);}
+#line 1959 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 79:
+#line 186 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.expressionVar) = insertExpression(NULL, (yyvsp[0].parseArgsVar), 0, NULL, NULL, NULL, NULL);}
+#line 1965 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 80:
+#line 187 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.expressionVar) = insertExpression(NULL, NULL, 1, (yyvsp[-1].id), NULL, NULL, NULL);}
+#line 1971 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 81:
+#line 188 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.expressionVar) = insertExpression(NULL, NULL, 0, (yyvsp[0].id), NULL, NULL, NULL);}
+#line 1977 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 82:
+#line 189 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.expressionVar) = insertExpression(NULL, NULL, 0, NULL, (yyvsp[0].id), NULL, NULL);}
+#line 1983 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 83:
+#line 190 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.expressionVar) = insertExpression(NULL, NULL, 0, NULL, NULL, "True", NULL);}
+#line 1989 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 84:
+#line 191 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.expressionVar) = insertExpression(NULL, NULL, 0, NULL, NULL, "False", NULL);}
+#line 1995 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 85:
+#line 192 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.expressionVar) = insertExpression(NULL, NULL, 0, NULL, NULL, NULL, (yyvsp[0].id));}
+#line 2001 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 86:
+#line 193 "jucompiler.y" /* yacc.c:1646  */
+    {error_yacc = 1; (yyval.expressionVar) = NULL;}
+#line 2007 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+
+#line 2011 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1708,7 +2235,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 158 "jucompiler.y" /* yacc.c:1906  */
+#line 195 "jucompiler.y" /* yacc.c:1906  */
 
 
 

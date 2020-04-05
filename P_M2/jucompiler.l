@@ -16,7 +16,7 @@
     int parseState = 0;
     int errol = 1;
     int erroc = 1;
-
+    extern program* programafinal;
   void resetline(){
   	nline++;
 	column=1;
@@ -43,15 +43,15 @@ IGNORE		        " "|\t|\f
 %%
 {reserved}          {if (state==1)printf("RESERVED(%s)\n",yytext);column+=yyleng;if(parseState==1) return RESERVED;}
 
-"0"                                                                         {if (state==1)printf("INTLIT(0)\n");column+=yyleng;if(parseState==1) return INTLIT;}
-{semzero}{numeroall}{numerof}                                                        {if (state==1)printf("INTLIT(%s)\n",yytext);column+=yyleng;if(parseState==1) return INTLIT;}
-{semzero}                                                        {if (state==1)printf("INTLIT(%s)\n",yytext);column+=yyleng;if(parseState==1) return INTLIT;}
+"0"                                                                         {if (state==1)printf("INTLIT(0)\n");column+=yyleng;if(parseState==1)yylval.id=strdup(yytext); return INTLIT;}
+{semzero}{numeroall}{numerof}                                                        {if (state==1)printf("INTLIT(%s)\n",yytext);column+=yyleng;if(parseState==1)yylval.id=strdup(yytext); return INTLIT;}
+{semzero}                                                        {if (state==1)printf("INTLIT(%s)\n",yytext);column+=yyleng;if(parseState==1)yylval.id=strdup(yytext); return INTLIT;}
 
 
-{NUMERO}"."{NUMERO}?                      {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;if(parseState==1) return REALLIT;}
-{NUMERO}?"."{NUMERO}                      {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;if(parseState==1) return REALLIT;}
-{NUMERO}?"."{NUMERO}?{expoente}{NUMERO}                       {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;if(parseState==1) return REALLIT;}
-{NUMERO}{expoente}{NUMERO}                       {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;if(parseState==1) return REALLIT;}
+{NUMERO}"."{NUMERO}?                      {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;if(parseState==1)yylval.id=strdup(yytext); return REALLIT;}
+{NUMERO}?"."{NUMERO}                      {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;if(parseState==1)yylval.id=strdup(yytext); return REALLIT;}
+{NUMERO}?"."{NUMERO}?{expoente}{NUMERO}                       {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;if(parseState==1)yylval.id=strdup(yytext); return REALLIT;}
+{NUMERO}{expoente}{NUMERO}                       {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;if(parseState==1)yylval.id=strdup(yytext); return REALLIT;}
 
 "while"             {if (state==1)printf("WHILE\n");column+=yyleng;if(parseState==1) return WHILE;}
 "void"              {if (state==1)printf("VOID\n");column+=yyleng;if(parseState==1) return VOID;}
@@ -97,11 +97,11 @@ IGNORE		        " "|\t|\f
 "&&"                {if (state==1)printf("AND\n");column+=yyleng;if(parseState==1) return AND;}
 "true"              {if (state==1)printf("BOOLLIT(true)\n");column+=yyleng;if(parseState==1) return TRUE;}
 "false"             {if (state==1)printf("BOOLLIT(false)\n");column+=yyleng;if(parseState==1) return FALSE;}
-{id}                {if (state==1)printf("ID(%s)\n",yytext);column+=yyleng;if(parseState==1) return ID;}
+{id}                {if (state==1)printf("ID(%s)\n",yytext);column+=yyleng;if(parseState==1)yylval.id=strdup(yytext); return ID;}
 
 <STRING><<EOF>>	                {column+=1;printf("Line %d, col %d: unterminated string literal\n",errol,erroc);yyterminate();}
 \"                              {BEGIN(STRING);errors = 0;errol = nline;erroc = column;column+=yyleng;yymore();}
-<STRING>\"                      {BEGIN 0; column+=1;if(errors == 0 && state == 1){printf("STRLIT(%s)\n",yytext);}if(parseState==1 && errors == 0)return STRLIT;}
+<STRING>\"                      {BEGIN 0; column+=1;if(errors == 0 && state == 1){printf("STRLIT(%s)\n",yytext);}if(parseState==1 && errors == 0)yylval.id=strdup(yytext);return STRLIT;}
 <STRING>\n|\r\n|\r              {printf("Line %d, col %d: unterminated string literal\n",errol,erroc);BEGIN 0;resetline();}
 <STRING>\\[\\fnrt"]             {yymore();column+=2;}
 <STRING>\\		                {printf("Line %d, col %d: invalid escape sequence (\\)\n",nline,column);errors = 1;column+=1;yymore();}
@@ -160,6 +160,7 @@ int main(int argc, char *argv[ ]){
     else{
         parseState=1;
         yyparse();
+        printTree(programafinal);
     }
     return 0;
 }

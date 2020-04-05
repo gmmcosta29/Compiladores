@@ -156,11 +156,28 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 44 "jucompiler.y" /* yacc.c:1909  */
+#line 62 "jucompiler.y" /* yacc.c:1909  */
 
     char *id;
+    program *programVar;
+    declarations *declarationsVar;
+    methodDec *methodDecVar;
+    fieldDec *fieldDecVar;
+    listFieldDec *listFieldDecVar;
+    methodHeader *methodHeaderVar;
+    params *paramsVar;
+    methodBody *methodBodyVar;
+    varDec *varDecVar;
+    listVarDec *listVarDecVar;
+    statement *statementVar;
+    listStatement *listStatementVar;
+    listExpression *listExpressionVar;
+    methodInvocation *methodInvocationVar;
+    assignment *assignmentVar;
+    parseArgs *parseArgsVar;
+    expression *expressionVar;
 
-#line 164 "y.tab.h" /* yacc.c:1909  */
+#line 181 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
