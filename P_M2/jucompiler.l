@@ -1,8 +1,9 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include "functions.h"
+#include "strutcs.h"
 #include "y.tab.h"
-#include <ctype.h>
     /*      Francisco Forte Nº2016225674
             Guilherme Costa Nº2017249276
     */

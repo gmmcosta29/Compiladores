@@ -1,5 +1,8 @@
-#ifdef STRUCTS
-#define STRUCTS
+#ifndef STRUCTURES_H
+#define STRUCTURES_H
+
+//falta estrutura de assignment e dotlengh nas expressions rever
+
 typedef struct _expression{
     struct _expression *right;
     struct _expression *left;
@@ -8,11 +11,11 @@ typedef struct _expression{
     char *realit;
     char *id;
     char *boollit;
-    char *dotlenght;
+    int dotlenght;
     struct _method_invocation *methodInvocation;
     struct _assignment *assignment;
     struct _parse_args *parseArgs;
-    struct _list_expression *expressions_head;
+    struct _list_expression *expressions_list;
 }expression;
 
 typedef struct  _expr_initial{
@@ -22,7 +25,7 @@ typedef struct  _expr_initial{
 
 typedef struct _statement{
     struct _print *print;
-    struct _method_invoc *methodInvoc;
+    struct _method_invocation *methodInvoc;
     struct _parse_args *parseArgs;
     struct _assignment *assignment;
     struct _if  *ifBlock;
@@ -32,23 +35,23 @@ typedef struct _statement{
     int semicolon; //flag  para separar semicolon de lpar rpar
 }statement;
 
+typedef struct _list_expression{
+    struct _expression *expression;
+    struct _list_expression *next;
+}listExpression;
+
 typedef struct _list_statement{
     struct _statement *statement;
     struct _list_statement *next;
 }listStatement;
 
-typedef struct _list_expression {
-    struct _expression *expression;
-    struct _list_expression *next;
-}listExpression;
-
 typedef struct _method_invocation{
-    char id*;
+    char *id;
     struct _list_expression *listExpression;
 }methodInvocation;
 
 typedef struct _parse_args{
-    char *id:
+    char *id;
     struct _expression *expression;
 }parseArgs;
 
@@ -56,10 +59,10 @@ typedef struct _return{
     struct _expression *expression;
 }returnBlock;
 
-typedef struct _assign{
+typedef struct _assignment{
     char *id;
     struct _expression *expression;
-}assign;
+}assignment;
 
 typedef struct _if{
     struct _expression *expression;
@@ -100,7 +103,7 @@ typedef struct _list_field_dec{
 typedef struct _params{
     char *type;
     char *id;
-    struct *_params *next;
+    struct _params *next;
 }params;
 
 typedef struct _method_header{
@@ -130,5 +133,4 @@ typedef struct _declarations{
 typedef struct _program{
     struct _declarations *declaration;
 }program;
-
 #endif

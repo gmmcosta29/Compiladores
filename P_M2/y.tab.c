@@ -67,6 +67,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "functions.h"
+#include "strutcs.h"
 #include "y.tab.h"
 
 int yylex (void);
@@ -75,7 +77,7 @@ int error_yacc=0;
 
 
 
-#line 79 "y.tab.c" /* yacc.c:339  */
+#line 81 "y.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -221,11 +223,11 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 42 "jucompiler.y" /* yacc.c:355  */
+#line 44 "jucompiler.y" /* yacc.c:355  */
 
     char *id;
 
-#line 229 "y.tab.c" /* yacc.c:355  */
+#line 231 "y.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -242,7 +244,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 246 "y.tab.c" /* yacc.c:358  */
+#line 248 "y.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -544,15 +546,15 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    46,    46,    48,    49,    50,    51,    53,    55,    56,
-      58,    60,    61,    63,    63,    63,    65,    66,    68,    69,
-      70,    72,    73,    75,    77,    78,    79,    81,    84,    86,
-      87,    89,    90,    91,    92,    93,    94,    95,    96,    97,
-      98,    99,   100,   101,   103,   104,   106,   107,   109,   110,
-     112,   113,   115,   117,   118,   120,   121,   123,   124,   125,
-     126,   127,   128,   129,   130,   131,   132,   133,   134,   135,
-     136,   137,   138,   139,   140,   141,   142,   145,   146,   147,
-     148,   149,   150,   151,   152,   153,   154
+       0,    48,    48,    50,    51,    52,    53,    55,    57,    58,
+      60,    62,    63,    65,    65,    65,    67,    68,    70,    71,
+      72,    74,    75,    77,    79,    80,    81,    83,    86,    88,
+      89,    91,    92,    93,    94,    95,    96,    97,    98,    99,
+     100,   101,   102,   103,   105,   106,   108,   109,   111,   112,
+     114,   115,   117,   119,   120,   122,   123,   125,   126,   127,
+     128,   129,   130,   131,   132,   133,   134,   135,   136,   137,
+     138,   139,   140,   141,   142,   143,   144,   147,   148,   149,
+     150,   151,   152,   153,   154,   155,   156
 };
 #endif
 
@@ -1478,7 +1480,7 @@ yyreduce:
   switch (yyn)
     {
       
-#line 1482 "y.tab.c" /* yacc.c:1646  */
+#line 1484 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1706,7 +1708,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 156 "jucompiler.y" /* yacc.c:1906  */
+#line 158 "jucompiler.y" /* yacc.c:1906  */
 
 
 

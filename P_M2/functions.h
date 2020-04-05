@@ -1,1 +1,32 @@
 #include "strutcs.h"
+
+program* insertProgram(declarations *declarationlist);
+declarations* insertDeclarationList(declarations *head,methodDec *methdec,fieldDec *fieldec,int semicolon);
+fieldDec* insertFieldDec(char *type, listFieldDec *fieldlist);
+listFieldDec* insertListFieldDec(listFieldDec *head,char *id);
+methodDec* insertMethodDec(methodBody *body,methodHeader *header);
+methodHeader* insertMethodHeader(char *type,char *id,params *params);
+params * insertParams(params *head,char *id,char *type);
+methodBody * insertMethodBody(methodBody *head,varDec *var,statement * state);
+varDec *insertVarDec(char *type,listVarDec *list);
+listVarDec * insertListVarDec(listVarDec *head,char *id);
+void resetStatement(statement *statement1);
+statement* insertListStatement(listStatement * head);
+listStatement * insertMultipleStatement(listStatement *head, statement * novo);
+statement* insertIfElse(expression *expression1,statement *statement1,statement *statement2);
+statement* insertWhile(expression *expression1,statement *statement1);
+statement * insertReturn(expression *expression1);
+statement * insertMethodInvocationStatement(methodInvocation *methodInvocation1);
+statement * insertAssignStatement(assignment *assign1);
+statement * insertParseArgsStatement(parseArgs *parseArgs1);
+statement * insertPrint(expression *expression1,char *id);
+listExpression * insertListExpression(listExpression *head, expression * expression1);
+methodInvocation * insertMethodInvocation(char *id,listExpression * head);
+assignment * insertAssign ( char * id, expression * expression1);
+parseArgs * insertParseArgs (char * id, expression * expression1);
+expression* insertAssignment(assignment *assign1);
+void resetExpression(expression *expression1);
+expression *insertMultipleExpression(expression *headexpression,expression *newexpression);
+expression *insertOperator(expression *expression1,char *operator,expression *expression2);
+expression* insertUnitary(char *operator,expression *expression1);
+expression* insertExpression(methodInvocation *methodInvocation1,parseArgs *parseArgs1,  int dotlength, char * id, char *intlit, char * boolit, char * reallit);

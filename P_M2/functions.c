@@ -2,136 +2,8 @@
 #include <string.h>
 #include <stdio.h>
 #include "strutcs.h"
-typedef struct _expression{
-    struct _expression *right;
-    struct _expression *left;
-    char *operator;
-    char *intlit;
-    char *realit;
-    char *id;
-    char *boollit;
-    char *dotlenght;
-    struct _method_invocation *methodInvocation;
-    struct _assignment *assignment;
-    struct _parse_args *parseArgs;
-    struct _list_expression *expressions_list;
-}expression;
+#include "functions.h"
 
-typedef struct  _expr_initial{
-    char *strinitial;
-    struct _expr_initial *next;
-}exprInitial;
-
-typedef struct _statement{
-    struct _print *print;
-    struct _method_invoc *methodInvoc;
-    struct _parse_args *parseArgs;
-    struct _assignment *assignment;
-    struct _if  *ifBlock;
-    struct  _while *whileBlock;
-    struct _list_statement *listStatement;
-    struct _return *returnblock;
-    int semicolon; //flag  para separar semicolon de lpar rpar
-}statement;
-
-typedef struct _list_statement{
-    struct _statement *statement;
-    struct _list_statement *next;
-}listStatement;
-
-typedef struct _list_expression {
-    struct _expression *expression;
-    struct _list_expression *next;
-}listExpression;
-
-typedef struct _method_invocation{
-    char id*;
-    struct _list_expression *listExpression;
-}methodInvocation;
-
-typedef struct _parse_args{
-    char *id:
-    struct _expression *expression;
-}parseArgs;
-
-typedef struct _return{
-    struct _expression *expression;
-}returnBlock;
-
-typedef struct _assign{
-    char *id;
-    struct _expression *expression;
-}assign;
-
-typedef struct _if{
-    struct _expression *expression;
-    struct _statement *listState;
-    struct _statement *listElseState;
-}ifBlock;
-
-typedef struct _print{
-    char *stringlit;
-    struct _expression *expression;
-}print;
-
-typedef struct _while{
-    struct _expression *expression;
-    struct _statement *listStatement;
-}whileBlock;
-
-typedef struct _var_dec{
-    char *type;
-    struct _list_var_dec *listVarDec;
-}varDec;
-
-typedef struct _list_var_dec{
-    char *id;
-    struct _list_var_dec *next;
-}listVarDec;
-
-typedef struct _field_dec{
-    char *type;
-    struct _list_field_dec *listFieldDec;
-}fieldDec;
-
-typedef struct _list_field_dec{
-    char *id;
-    struct _list_field_dec *next;
-}listFieldDec;
-
-typedef struct _params{
-    char *type;
-    char *id;
-    struct *_params *next;
-}params;
-
-typedef struct _method_header{
-    char *type;
-    char *id;
-    struct _params *params;
-}methodHeader;
-
-typedef struct _method_dec{
-    struct _method_header *methodHeader;
-    struct _method_body *methodBody;
-}methodDec;
-
-typedef struct _method_body{
-    struct _statement *statement;
-    struct _var_dec *varDec;
-    struct _method_body *next;
-}methodBody;
-
-typedef struct _declarations{
-    struct _method_dec *methodDec;
-    struct _field_dec *fieldDec;
-    int semicolon;
-    struct _declarations *next;
-}declarations;
-
-typedef struct _program{
-    struct _declarations *declaration;
-}program;
 
 program* insertProgram(declarations *declarationlist){
     program *pro = (program*)malloc(sizeof(program));
@@ -169,7 +41,7 @@ fieldDec* insertFieldDec(char *type, listFieldDec *fieldlist){
     new->listFieldDec = fieldlist;
     return new;
 }
-listFieldDec* insertListFieldDec(listFieldDec head,char *id){
+listFieldDec* insertListFieldDec(listFieldDec *head,char *id){
     listFieldDec *new = (listFieldDec*)malloc(sizeof(listFieldDec)),*temp;
     new->id = (char*)strdup(id);
     new->next =NULL;
@@ -198,14 +70,14 @@ methodHeader* insertMethodHeader(char *type,char *id,params *params){
     return new;
 }
 params * insertParams(params *head,char *id,char *type){
-    params * new = (params*)malloc(sizeof(params));
+    params * new = (params*)malloc(sizeof(params)),*temp;
     new->type = (char *)strdup(type);
     new->id =(char *)strdup(id);
     new->next = NULL;
     if(!head){
         return  new;
     }
-    for(temp = head,temp->next;temp = temp->next);
+    for(temp = head;temp->next;temp = temp->next);
     temp->next = new;
     return head;
 }
@@ -217,8 +89,7 @@ methodBody * insertMethodBody(methodBody *head,varDec *var,statement * state){
         new->statement = NULL;
     }else{
         new->statement = state;
-        new->varDec =
- NULL;
+        new->varDec =NULL;
     }
     if(!head) return new;
     for(temp = head;temp->next;temp = temp->next);
@@ -252,14 +123,14 @@ void resetStatement(statement *statement1){
     statement1->returnblock = NULL;
 }
 
-statement* insertListStatement(listStatement * head){
+statement* insertListStatement(listStatement *head){
     statement *new = (statement*)malloc(sizeof(statement));
     resetStatement(new);
     new->listStatement = head;
     return new;
 }
 listStatement * insertMultipleStatement(listStatement *head, statement * novo){
-    listStatement  *new = (listStatement)malloc(sizeof(listStatement)),*temp;
+    listStatement  *new = (listStatement*)malloc(sizeof(listStatement)),*temp;
     new->statement = novo;
     new->next = NULL;
     if(!head) return new;
@@ -294,23 +165,24 @@ statement * insertReturn(expression *expression1){
     returnBlock * returnBlock1 = (returnBlock*)malloc(sizeof(returnBlock));
     new->returnblock = returnBlock1;
     new->returnblock->expression = expression1;
-    return expression;
+    return new;
 }
 
-statement * insertMethodInvocation(methodInvocation *methodInvocation1){
+statement * insertMethodInvocationStatement(methodInvocation *methodInvocation1){
     statement *new = (statement*)malloc(sizeof(statement));
     resetStatement(new);
     new->methodInvoc = methodInvocation1;
+
     return new;
 }
-statement * insertAssign(assign *assign1){
+statement * insertAssignStatement(assignment *assign1){
     statement *new = (statement*)malloc(sizeof(statement));
     resetStatement(new);
     new->assignment = assign1;
     return new;
 }
 
-statement * insertParseArgs(parseArgs *parseArgs1){
+statement * insertParseArgsStatement(parseArgs *parseArgs1){
     statement *new = (statement*)malloc(sizeof(statement));
     resetStatement(new);
     new->parseArgs = parseArgs1;
@@ -343,22 +215,23 @@ methodInvocation * insertMethodInvocation(char *id,listExpression * head){
     return new;
 }
 
-assign * insertAssign ( char * id, expression * expression1) {
-    assign * new = (assign*)malloc(sizeof(assign));
+assignment * insertAssign( char * id, expression * expression1) {
+    assignment * new = (assignment*)malloc(sizeof(assignment));
     new->id = (char*)strdup(id);
     new->expression = expression1;
-    return new
+    return new;
 }
 
 parseArgs * insertParseArgs (char * id, expression * expression1){
-    parseArgs * new = (parseArgs*)malloc(sizeof(parseArgs))
+    parseArgs * new = (parseArgs*)malloc(sizeof(parseArgs));
     new->id = (char *)strdup(id);
     new->expression = expression1;
     return new;
 }
 
-expression* insertAssignment(assign *assign1){
+expression* insertAssignment(assignment *assign1){
     expression *new = (expression*)malloc(sizeof(expression));
+    resetExpression(new);
     new->assignment = assign1;
     return new;
 }
@@ -370,15 +243,15 @@ void resetExpression(expression *expression1){
     expression1->methodInvocation = NULL;
     expression1->boollit = NULL;
     expression1->intlit = NULL;
-    expression1->dotlenght = NULL;
+    expression1->dotlenght = 0;
     expression1->left = NULL;
     expression1->operator = NULL;
     expression1->realit = NULL;
     expression1->right = NULL;
-}
+}                           
 
 expression *insertMultipleExpression(expression *headexpression,expression *newexpression){
-    listExpression *new  = (listExpression)malloc(sizeof(listExpression)),*aux = headexpression->expressions_list;
+    listExpression *new  = (listExpression *)malloc(sizeof(listExpression)),*aux = headexpression->expressions_list;
     new->expression = newexpression;
     new->next = NULL;
     if(aux){
@@ -406,15 +279,14 @@ expression* insertUnitary(char *operator,expression *expression1){
     return new;
 }
 
-expression* insertExpression(methodInvocation *methodInvocation1,parseArgs *parseArgs1, char * id, int dotlength, char * id, int intlit, char * true, char * false, char * reallit){
+expression* insertExpression(methodInvocation *methodInvocation1,parseArgs *parseArgs1,  int dotlength, char * id, char *intlit, char * boolit, char * reallit){
     expression *new = (expression*)malloc(sizeof(expression));
     new->methodInvocation = methodInvocation1;
     new->parseArgs = parseArgs1;
     new->id = (char *)strdup(id);
     new->dotlenght = dotlength;
-    new->intlit = intlit;
-    new->true = (char *)strdup(true);
-    new->false = (char *)strdup(false);
+    new->intlit = (char *)strdup(intlit);
+    new->boollit = (char *)strdup(boolit);
     new->realit = (char *)strdup(reallit);
     return new;
 
