@@ -40,3 +40,5 @@ void printVarDecl(varDec *aux);
 void printExpression(expression *expr);
 int countStatement(statement *state);
 void printStatement(statement *state);
+int countStatement2(statement *state);
+void printStateIf (statement *state);

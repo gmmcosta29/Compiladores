@@ -48,53 +48,53 @@ extern int yydebug;
     INTLIT = 258,
     REALLIT = 259,
     STRLIT = 260,
-    ESTRING = 261,
-    ID = 262,
-    WHILE = 263,
-    VOID = 264,
-    STRING1 = 265,
-    STATIC = 266,
-    RETURN = 267,
-    PUBLIC = 268,
-    PARSEINT = 269,
-    PRINT = 270,
-    ARROW = 271,
-    RESERVED = 272,
-    INT = 273,
-    IF = 274,
-    ELSE = 275,
-    DOUBLE = 276,
-    DOTLENGTH = 277,
-    BOOL = 278,
-    CLASS = 279,
-    XOR = 280,
-    RSHIFT = 281,
-    LSHIFT = 282,
-    SEMICOLON = 283,
-    RSQ = 284,
-    RPAR = 285,
-    RBRACE = 286,
-    LSQ = 287,
-    LPAR = 288,
-    LBRACE = 289,
-    PLUS = 290,
-    STAR = 291,
-    MINUS = 292,
-    DIV = 293,
-    MOD = 294,
-    LT = 295,
-    GT = 296,
-    EQ = 297,
-    NE = 298,
-    LE = 299,
-    GE = 300,
-    OR = 301,
-    AND = 302,
-    NOT = 303,
-    COMMA = 304,
-    ASSIGN = 305,
-    TRUE = 306,
-    FALSE = 307,
+    ID = 261,
+    WHILE = 262,
+    VOID = 263,
+    STRING1 = 264,
+    STATIC = 265,
+    RETURN = 266,
+    PUBLIC = 267,
+    PARSEINT = 268,
+    PRINT = 269,
+    ARROW = 270,
+    RESERVED = 271,
+    INT = 272,
+    IF = 273,
+    ELSE = 274,
+    DOUBLE = 275,
+    DOTLENGTH = 276,
+    BOOL = 277,
+    CLASS = 278,
+    XOR = 279,
+    RSHIFT = 280,
+    LSHIFT = 281,
+    SEMICOLON = 282,
+    RSQ = 283,
+    RPAR = 284,
+    RBRACE = 285,
+    LSQ = 286,
+    LPAR = 287,
+    LBRACE = 288,
+    PLUS = 289,
+    STAR = 290,
+    MINUS = 291,
+    DIV = 292,
+    MOD = 293,
+    LT = 294,
+    GT = 295,
+    EQ = 296,
+    NE = 297,
+    LE = 298,
+    GE = 299,
+    OR = 300,
+    AND = 301,
+    NOT = 302,
+    COMMA = 303,
+    ASSIGN = 304,
+    TRUE = 305,
+    FALSE = 306,
+    UNITARY = 307,
     LOWER_THAN_ELSE = 308
   };
 #endif
@@ -102,53 +102,53 @@ extern int yydebug;
 #define INTLIT 258
 #define REALLIT 259
 #define STRLIT 260
-#define ESTRING 261
-#define ID 262
-#define WHILE 263
-#define VOID 264
-#define STRING1 265
-#define STATIC 266
-#define RETURN 267
-#define PUBLIC 268
-#define PARSEINT 269
-#define PRINT 270
-#define ARROW 271
-#define RESERVED 272
-#define INT 273
-#define IF 274
-#define ELSE 275
-#define DOUBLE 276
-#define DOTLENGTH 277
-#define BOOL 278
-#define CLASS 279
-#define XOR 280
-#define RSHIFT 281
-#define LSHIFT 282
-#define SEMICOLON 283
-#define RSQ 284
-#define RPAR 285
-#define RBRACE 286
-#define LSQ 287
-#define LPAR 288
-#define LBRACE 289
-#define PLUS 290
-#define STAR 291
-#define MINUS 292
-#define DIV 293
-#define MOD 294
-#define LT 295
-#define GT 296
-#define EQ 297
-#define NE 298
-#define LE 299
-#define GE 300
-#define OR 301
-#define AND 302
-#define NOT 303
-#define COMMA 304
-#define ASSIGN 305
-#define TRUE 306
-#define FALSE 307
+#define ID 261
+#define WHILE 262
+#define VOID 263
+#define STRING1 264
+#define STATIC 265
+#define RETURN 266
+#define PUBLIC 267
+#define PARSEINT 268
+#define PRINT 269
+#define ARROW 270
+#define RESERVED 271
+#define INT 272
+#define IF 273
+#define ELSE 274
+#define DOUBLE 275
+#define DOTLENGTH 276
+#define BOOL 277
+#define CLASS 278
+#define XOR 279
+#define RSHIFT 280
+#define LSHIFT 281
+#define SEMICOLON 282
+#define RSQ 283
+#define RPAR 284
+#define RBRACE 285
+#define LSQ 286
+#define LPAR 287
+#define LBRACE 288
+#define PLUS 289
+#define STAR 290
+#define MINUS 291
+#define DIV 292
+#define MOD 293
+#define LT 294
+#define GT 295
+#define EQ 296
+#define NE 297
+#define LE 298
+#define GE 299
+#define OR 300
+#define AND 301
+#define NOT 302
+#define COMMA 303
+#define ASSIGN 304
+#define TRUE 305
+#define FALSE 306
+#define UNITARY 307
 #define LOWER_THAN_ELSE 308
 
 /* Value type.  */
@@ -156,11 +156,28 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 42 "jucompiler.y" /* yacc.c:1909  */
+#line 62 "jucompiler.y" /* yacc.c:1909  */
 
     char *id;
+    program *programVar;
+    declarations *declarationsVar;
+    methodDec *methodDecVar;
+    fieldDec *fieldDecVar;
+    listFieldDec *listFieldDecVar;
+    methodHeader *methodHeaderVar;
+    params *paramsVar;
+    methodBody *methodBodyVar;
+    varDec *varDecVar;
+    listVarDec *listVarDecVar;
+    statement *statementVar;
+    listStatement *listStatementVar;
+    listExpression *listExpressionVar;
+    methodInvocation *methodInvocationVar;
+    assignment *assignmentVar;
+    parseArgs *parseArgsVar;
+    expression *expressionVar;
 
-#line 164 "y.tab.h" /* yacc.c:1909  */
+#line 181 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

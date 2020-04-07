@@ -8,7 +8,7 @@
             Guilherme Costa Nº2017249276
     */
 
-    int yaccError = 0;
+    extern int error_yacc;
     int nline = 1;
     int column = 1;
     int errors = 0;
@@ -26,8 +26,8 @@
 %}
 NEWLINE             \r|\n|\r\n
 STARTCOMMENT_1	    "//"
-NUMEROZERO          ([1-9]([0-9|_]*[0-9])?)|0   
-NUMERO                 [0-9]([0-9|_]*[0-9])?              
+NUMEROZERO          ([1-9]([0-9_]*[0-9])?)|0   
+NUMERO                 [0-9]([0-9_]*[0-9])?              
 INITSTRING           \"
 UNDERSCORE          "_"
 numeroall           [0-9|_]*
@@ -43,15 +43,15 @@ IGNORE		        " "|\t|\f
 %%
 {reserved}          {if (state==1)printf("RESERVED(%s)\n",yytext);column+=yyleng;if(parseState==1) return RESERVED;}
 
-"0"                                                                         {if (state==1)printf("INTLIT(0)\n");column+=yyleng;if(parseState==1)yylval.id=strdup(yytext); return INTLIT;}
-{semzero}{numeroall}{numerof}                                                        {if (state==1)printf("INTLIT(%s)\n",yytext);column+=yyleng;if(parseState==1)yylval.id=strdup(yytext); return INTLIT;}
-{semzero}                                                        {if (state==1)printf("INTLIT(%s)\n",yytext);column+=yyleng;if(parseState==1)yylval.id=strdup(yytext); return INTLIT;}
+"0"                                                                         {if (state==1)printf("INTLIT(0)\n");column+=yyleng;if(parseState==1){yylval.id=strdup(yytext); return INTLIT;}}
+{semzero}{numeroall}{numerof}                                                        {if (state==1)printf("INTLIT(%s)\n",yytext);column+=yyleng;if(parseState==1){yylval.id=strdup(yytext); return INTLIT;}}
+{semzero}                                                        {if (state==1)printf("INTLIT(%s)\n",yytext);column+=yyleng;if(parseState==1){yylval.id=strdup(yytext); return INTLIT;}}
 
 
-{NUMERO}"."{NUMERO}?                      {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;if(parseState==1)yylval.id=strdup(yytext); return REALLIT;}
-{NUMERO}?"."{NUMERO}                      {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;if(parseState==1)yylval.id=strdup(yytext); return REALLIT;}
-{NUMERO}?"."{NUMERO}?{expoente}{NUMERO}                       {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;if(parseState==1)yylval.id=strdup(yytext); return REALLIT;}
-{NUMERO}{expoente}{NUMERO}                       {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;if(parseState==1)yylval.id=strdup(yytext); return REALLIT;}
+{NUMERO}"."{NUMERO}?                      {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;if(parseState==1){yylval.id=strdup(yytext); return REALLIT;}}
+{NUMERO}?"."{NUMERO}                      {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;if(parseState==1){yylval.id=strdup(yytext); return REALLIT;}}
+{NUMERO}?"."{NUMERO}?{expoente}{NUMERO}                       {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;if(parseState==1){yylval.id=strdup(yytext); return REALLIT;}}
+{NUMERO}{expoente}{NUMERO}                       {if (state==1)printf("REALLIT(%s)\n",yytext);column+=yyleng;if(parseState==1){yylval.id=strdup(yytext); return REALLIT;}}
 
 "while"             {if (state==1)printf("WHILE\n");column+=yyleng;if(parseState==1) return WHILE;}
 "void"              {if (state==1)printf("VOID\n");column+=yyleng;if(parseState==1) return VOID;}
@@ -97,22 +97,22 @@ IGNORE		        " "|\t|\f
 "&&"                {if (state==1)printf("AND\n");column+=yyleng;if(parseState==1) return AND;}
 "true"              {if (state==1)printf("BOOLLIT(true)\n");column+=yyleng;if(parseState==1) return TRUE;}
 "false"             {if (state==1)printf("BOOLLIT(false)\n");column+=yyleng;if(parseState==1) return FALSE;}
-{id}                {if (state==1)printf("ID(%s)\n",yytext);column+=yyleng;if(parseState==1)yylval.id=strdup(yytext); return ID;}
+{id}                {if (state==1)printf("ID(%s)\n",yytext);column+=yyleng;if(parseState==1){yylval.id=strdup(yytext); return ID;}}
 
-<STRING><<EOF>>	                {column+=1;printf("Line %d, col %d: unterminated string literal\n",errol,erroc);yyterminate();}
-\"                              {BEGIN(STRING);errors = 0;errol = nline;erroc = column;column+=yyleng;yymore();}
-<STRING>\"                      {BEGIN 0; column+=1;if(errors == 0 && state == 1){printf("STRLIT(%s)\n",yytext);}if(parseState==1 && errors == 0)yylval.id=strdup(yytext);return STRLIT;}
+<STRING><<EOF>>	                {if(parseState==1)column++;printf("Line %d, col %d: unterminated string literal\n",errol,erroc);yyterminate();}
+\"                              {BEGIN(STRING);errors = 0;errol = nline;erroc = column;column+=yyleng;if(parseState==1)yymore();}
+<STRING>\"                      {BEGIN 0; column+=1;if(errors == 0 && state == 1){printf("STRLIT(\"%s)\n",yytext);}if(parseState==1 && errors == 0){yylval.id=strdup(yytext);return STRLIT;}}
 <STRING>\n|\r\n|\r              {printf("Line %d, col %d: unterminated string literal\n",errol,erroc);BEGIN 0;resetline();}
 <STRING>\\[\\fnrt"]             {yymore();column+=2;}
-<STRING>\\		                {printf("Line %d, col %d: invalid escape sequence (\\)\n",nline,column);errors = 1;column+=1;yymore();}
-<STRING>\\[^\n\r]?		        {printf("Line %d, col %d: invalid escape sequence (\\%c)\n",nline,column,yytext[yyleng - 1]);errors = 1;column+=2;yymore();}
+<STRING>\\		                {printf("Line %d, col %d: invalid escape sequence (\\)\n",nline,column);errors = 1;column+=1;if(parseState==1)yymore();}
+<STRING>\\[^\n\r]?		        {printf("Line %d, col %d: invalid escape sequence (\\%c)\n",nline,column,yytext[yyleng - 1]);errors = 1;column+=2;if(parseState==1)yymore();}
 <STRING>.                       {yymore();column+=1;}
 
 {STARTCOMMENT_1}				{BEGIN COMMENT_1;}
 <COMMENT_1>{NEWLINE}				{BEGIN 0; resetline();}
 <COMMENT_1>.					
 
-<COMMENT><<EOF>>	    {column+=1;printf("Line %d, col %d: unterminated comment\n",errol, erroc);yyterminate();} 
+<COMMENT><<EOF>>	    {if(parseState==1)column++;printf("Line %d, col %d: unterminated comment\n",errol, erroc);yyterminate();} 
 "/*"                   {BEGIN COMMENT;errol = nline;erroc = column;column+=yyleng;}
 <COMMENT>"*/"           {BEGIN INITIAL;column+=yyleng;}
 <COMMENT>{NEWLINE}             {resetline();}
@@ -143,16 +143,19 @@ int main(int argc, char *argv[ ]){
 			yylex();
 			return 0;
         }
-        if(strcmp(argv[1],nStr)==0){
+        else if(strcmp(argv[1],nStr)==0){
 			state=0;
 			yylex();
-			return 0;
         }
-        if(strcmp(argv[1], parseStr)==0){
+        else if(strcmp(argv[1], parseStr)==0){
             parseState=1;
-            yyparse();
+            if(yyparse() == 0) {
+                if(error_yacc == 0){
+                    printTree(programafinal);
+                }
+            }
         }
-        if(strcmp(argv[1], nParseStr)==0){
+        else if(strcmp(argv[1], nParseStr)==0){
             parseState=1;
             yyparse();
         }
@@ -160,7 +163,6 @@ int main(int argc, char *argv[ ]){
     else{
         parseState=1;
         yyparse();
-        printTree(programafinal);
     }
     return 0;
 }
