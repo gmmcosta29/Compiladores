@@ -132,6 +132,7 @@ void yyerror(char *msg) {
 }
 
 
+
 int main(int argc, char *argv[ ]){
     if(argc==2){
         char *nStr = "-e1";
@@ -158,6 +159,15 @@ int main(int argc, char *argv[ ]){
         else if(strcmp(argv[1], nParseStr)==0){
             parseState=1;
             yyparse();
+        }else if(strcmp(argv[1], "-s")==0){
+            parseState=1;
+            if(yyparse() == 0) {
+                if(error_yacc == 0){
+                    check_program(programafinal);
+                    show_symtab();
+                    printTree(programafinal);
+                }
+            }
         }
     }
     else{

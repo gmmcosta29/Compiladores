@@ -17,11 +17,11 @@
 %}
 NEWLINE             \r|\n|\r\n
 STARTCOMMENT_1	    "//"
-NUMEROZERO          ([1-9]([0-9|_]*[0-9])?)|0   
-NUMERO                 [0-9]([0-9|_]*[0-9])?              
+NUMEROZERO          ([1-9]([0-9_]*[0-9])?)|0   
+NUMERO                 [0-9]([0-9_]*[0-9])?              
 INITSTRING           \"
 UNDERSCORE          "_"
-numeroall           [0-9|_]*
+numeroall           [0-9_]*
 numerof             [0-9]+
 semzero             [1-9]+
 expoente           ([Ee][+-]?)
