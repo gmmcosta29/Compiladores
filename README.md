@@ -10,8 +10,11 @@
 # Technical Stack
 
 **Language**: C
+
 **Build System**: Make
+
 **Tools**: Flex (lexer), Bison/Yacc (parser generator)
+
 **Build**: Standard Unix toolchain (gcc, make)
 
 # Features Implemented
@@ -20,9 +23,11 @@
 - Complete token recognition for Juc language
 - Comment handling (// and /* */)
 - Error recovery with detailed diagnostics
+  
 **Syntax Analysis**:
 - LALR(1) grammar with conflict resolution
 - Abstract Syntax Tree construction
+  
 **Semantic Analysis**:
 - Multi-scope symbol table management
 - Type inference and checking
